@@ -1,5 +1,16 @@
-### Login Request
-POST http://localhost:8000/api/login
+### Register
+POST http://localhost:8000/api/auth/register
+Content-Type: application/json
+
+{
+    "name": "Test User",
+    "email": "test@example.com",
+    "password": "password",
+    "password_confirmation": "password"
+}
+
+### Login
+POST http://localhost:8000/api/auth/login
 Content-Type: application/json
 
 {
@@ -7,10 +18,50 @@ Content-Type: application/json
     "password": "password"
 }
 
-### Get User Info (requires token from login response)
-GET http://localhost:8000/api/user
+### Get Current User
+GET http://localhost:8000/api/auth/me
 Authorization: Bearer YOUR_TOKEN_HERE
 
-### Logout (requires token)
-POST http://localhost:8000/api/logout
+### Get All Users
+GET http://localhost:8000/api/users
+Authorization: Bearer YOUR_TOKEN_HERE
+
+### Get Single User
+GET http://localhost:8000/api/users/1
+Authorization: Bearer YOUR_TOKEN_HERE
+
+### Update User
+PUT http://localhost:8000/api/users/1
+Authorization: Bearer YOUR_TOKEN_HERE
+Content-Type: application/json
+
+{
+    "name": "Updated Name",
+    "email": "updated@example.com"
+}
+
+### Get User Profile
+GET http://localhost:8000/api/user/profile
+Authorization: Bearer YOUR_TOKEN_HERE
+
+### Update User Profile
+PUT http://localhost:8000/api/user/profile
+Authorization: Bearer YOUR_TOKEN_HERE
+Content-Type: application/json
+
+{
+    "name": "Updated Profile Name",
+    "email": "profile@example.com"
+}
+
+### Refresh Token
+POST http://localhost:8000/api/auth/refresh
+Authorization: Bearer YOUR_TOKEN_HERE
+
+### Logout
+POST http://localhost:8000/api/auth/logout
+Authorization: Bearer YOUR_TOKEN_HERE
+
+### Delete User
+DELETE http://localhost:8000/api/users/1
 Authorization: Bearer YOUR_TOKEN_HERE
