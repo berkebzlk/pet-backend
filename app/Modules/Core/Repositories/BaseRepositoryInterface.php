@@ -2,8 +2,11 @@
 
 namespace App\Modules\Core\Repositories;
 
+use Illuminate\Database\Eloquent\Model;
+
 interface BaseRepositoryInterface
 {
+    public function getModel(): Model;
     public function create(array $data);
     public function findAll();
     public function findById(int $id);

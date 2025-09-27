@@ -7,11 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 
 abstract class BaseRepositoryEloquent implements BaseRepositoryInterface
 {
-    protected Model $model;
+    public Model $model;
 
     public function __construct(Model $model)
     {
         $this->model = $model;
+    }
+
+    public function getModel(): Model
+    {
+        return $this->model;
     }
 
     public function findById(int $id)
@@ -31,21 +36,16 @@ abstract class BaseRepositoryEloquent implements BaseRepositoryInterface
 
     public function update(int $id, array $data)
     {
-        $record = $this->model->find($id);
-        if ($record) {
-            $record->update($data);
-            return $record;
-        }
-        return null;
+        $this->model->update($data);
     }
 
     public function delete(int $id)
     {
-        return $this->model->delete($id);
+        return $this->model->where('id', $id)->delete();
     }
 
     public function destroy(int $id)
     {
-        return $this->model->forceDelete($id);
+        return $this->model->where('id', $id)->forceDelete();
     }
 }
