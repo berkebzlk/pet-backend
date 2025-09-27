@@ -46,6 +46,23 @@ class ModuleServiceProvider extends ServiceProvider
             if (File::isDirectory($viewPath)) {
                 $this->loadViewsFrom($viewPath, strtolower($moduleName));
             }
+
+            // Lang dosyalarını yükle
+            $langPath = $module . '/Resources/lang';
+            if (File::isDirectory($langPath)) {
+                $this->loadTranslationsFrom($langPath, strtolower($moduleName));
+            }
+
+            // Config dosyalarını yükle
+            $configPath = $module . '/Config';
+            if (File::isDirectory($configPath)) {
+                foreach (File::files($configPath) as $file) {
+                    $filename = pathinfo($file, PATHINFO_FILENAME);
+                    
+                    // Load with namespace: 'role::role' example: app/Modules/Role/Config/role.php => 'role::role'
+                    $this->mergeConfigFrom($file->getPathname(), strtolower($moduleName) . '::' . $filename);
+                }
+            }
         }
     }
 
