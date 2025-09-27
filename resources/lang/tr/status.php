@@ -1,8 +1,10 @@
 <?php
 
+use App\Modules\Core\Enums\StatusEnum;
+
 return [
-    'success' => 'Başarılı',
-    'error' => 'Hata',
-    'warning' => 'Uyarı',
-    'info' => 'Bilgi',
+    StatusEnum::SUCCESS->value => 'Başarılı',
+    StatusEnum::ERROR->value => 'Hata',
+    StatusEnum::WARNING->value => 'Uyarı',
+    StatusEnum::INFO->value => 'Bilgi',
 ];
