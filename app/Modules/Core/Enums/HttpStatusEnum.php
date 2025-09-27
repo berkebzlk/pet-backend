@@ -16,4 +16,36 @@ enum HttpStatusEnum: int
     case INTERNAL_SERVER_ERROR = 500;   
     case SERVICE_UNAVAILABLE = 503;
     case GATEWAY_TIMEOUT = 504;
+
+    public function label(): string
+    {
+        static $httpLabels = null;
+        if ($httpLabels === null) {
+            $httpLabels = trans('http');
+        }
+
+        return match ($this) {
+            self::SUCCESS => $httpLabels['success'] ?? '',
+            self::CREATED => $httpLabels['created'] ?? '',
+            self::NO_CONTENT => $httpLabels['no_content'] ?? '',
+            self::BAD_REQUEST => $httpLabels['bad_request'] ?? '',
+            self::UNAUTHORIZED => $httpLabels['unauthorized'] ?? '',
+            self::FORBIDDEN => $httpLabels['forbidden'] ?? '',
+            self::NOT_FOUND => $httpLabels['not_found'] ?? '',
+            self::METHOD_NOT_ALLOWED => $httpLabels['method_not_allowed'] ?? '',
+            self::UNPROCESSABLE_ENTITY => $httpLabels['unprocessable_entity'] ?? '',
+            self::INTERNAL_SERVER_ERROR => $httpLabels['internal_server_error'] ?? '',
+            self::SERVICE_UNAVAILABLE => $httpLabels['service_unavailable'] ?? '',
+            self::GATEWAY_TIMEOUT => $httpLabels['gateway_timeout'] ?? '',
+        };
+    }
+
+    public static function labels(): array
+    {
+        $map = [];
+        foreach (self::cases() as $case) {
+            $map[$case->value] = $case->label();
+        }
+        return $map;
+    }
 }
