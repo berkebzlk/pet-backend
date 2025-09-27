@@ -39,12 +39,12 @@ class UpdateUserRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.string' => __('validation.name_string'),
-            'name.max' => __('validation.name_max'),
-            'email.email' => __('validation.email_format'),
-            'email.unique' => __('validation.email_unique'),
-            'password.min' => __('validation.password_min'),
-            'password.confirmed' => __('validation.password_confirmed'),
+            'name.string' => __('validation.string'),
+            'name.max' => __('validation.max'),
+            'email.email' => __('validation.email'),
+            'email.unique' => __('validation.unique'),
+            'password.min' => __('validation.min'),
+            'password.confirmed' => __('validation.confirmed'),
         ];
     }
 }
