@@ -3,7 +3,7 @@
 use App\Modules\Core\Enums\HttpStatusEnum;
 
 return [
-    HttpStatusEnum::SUCCESS->value => 'Başarılı',
+    HttpStatusEnum::OK->value => 'Başarılı',
     HttpStatusEnum::CREATED->value => 'Oluşturuldu',
     HttpStatusEnum::NO_CONTENT->value => 'İçerik Yok',
     HttpStatusEnum::BAD_REQUEST->value => 'Hatalı İstek',

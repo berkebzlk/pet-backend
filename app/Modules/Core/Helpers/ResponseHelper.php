@@ -2,14 +2,14 @@
 
 namespace App\Modules\Core\Helpers;
 
+use App\Modules\Core\Enums\HttpStatusEnum;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
 
 class ResponseHelper
 {
     public static function success(
         mixed $data = null,
-        int $statusCode = Response::HTTP_OK,
+        int $statusCode = HttpStatusEnum::OK->value,
         ?string $message = null
     ): JsonResponse {
         $response = [

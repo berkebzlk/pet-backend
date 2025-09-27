@@ -2,6 +2,7 @@
 
 namespace App\Modules\Role\Controllers;
 
+use App\Modules\Core\Enums\HttpStatusEnum;
 use App\Modules\Core\Helpers\ResponseHelper;
 use App\Modules\Role\Requests\StoreRoleRequest;
 use App\Modules\Role\Requests\UpdateRoleRequest;
@@ -19,7 +20,7 @@ class RoleController extends Controller
     {
         $role = $this->roleService->store($request->validated());
 
-        return ResponseHelper::success(new RoleResource($role), 201, __('crud.created', ['attribute' => $this->roleService->getModelName()]));
+        return ResponseHelper::success(new RoleResource($role), HttpStatusEnum::CREATED->value, __('crud.created', ['attribute' => $this->roleService->getModelName()]));
     }
     
     public function index()
@@ -40,13 +41,13 @@ class RoleController extends Controller
     {
         $role = $this->roleService->update($id, $request->validated());
 
-        return ResponseHelper::success(new RoleResource($role), 200, __('role::role.updated_successfully'));
+        return ResponseHelper::success(new RoleResource($role), HttpStatusEnum::OK->value, __('role::role.updated_successfully'));
     }
 
     public function delete(int $id)
     {
         $this->roleService->delete($id);
 
-        return ResponseHelper::success(null, 200, __('role::role.deleted_successfully'));
+        return ResponseHelper::success(null, HttpStatusEnum::OK->value, __('role::role.deleted_successfully'));
     }
 }

@@ -4,7 +4,7 @@ namespace App\Modules\Core\Enums;
 
 enum HttpStatusEnum: int
 {
-    case SUCCESS = 200;
+    case OK = 200;
     case CREATED = 201;
     case NO_CONTENT = 204;
     case BAD_REQUEST = 400;
@@ -25,7 +25,7 @@ enum HttpStatusEnum: int
         }
 
         return match ($this) {
-            self::SUCCESS => $httpLabels['success'] ?? '',
+            self::OK => $httpLabels['success'] ?? '',
             self::CREATED => $httpLabels['created'] ?? '',
             self::NO_CONTENT => $httpLabels['no_content'] ?? '',
             self::BAD_REQUEST => $httpLabels['bad_request'] ?? '',
