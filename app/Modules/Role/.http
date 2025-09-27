@@ -1,0 +1,104 @@
+@bearer_token = eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIwMTk5NzMzYS0zYzBkLTcwNGUtOTJhZS1kNTJkOWNjZThlZjgiLCJqdGkiOiI0Nzg3OTA4OTk0ZTYwZDljOGU3MjkxZTlhNzQzMmFlNTExY2NiNTQwOTU5YTkzZmViODIwMWY1OTNkYTc0YjA0YTllNTZlNzg3ZDc1OWNhZiIsImlhdCI6MTc1ODk4MTYxMS4zNjQwODIsIm5iZiI6MTc1ODk4MTYxMS4zNjQwODQsImV4cCI6MTc5MDUxNzYxMS4zNTE2Niwic3ViIjoiMyIsInNjb3BlcyI6W119.ZREorraXKq7KUYVJzXrJjXHDiI5f7GIlxU124B2wNqFTztlMCyYpW5jCiLYjM30qYflu3prYgM7Ps-988XDNvNvQsnab6k4E3BDHf-pJTT_CtepkuIhdhjRkNTqG4hQkPH6z_F8RS39i_N9O6NK39wAFfNOxhk2RekJCK_OFP1wQfMOBdIYfYxLRoNcV4YZMSEJfwP39SZ5_kuk0_0L7ony8vpwFd2KGrjOhP4jkC5jalEJAsUq7Fp4Wy_4vJ6jvaH439rMroosPfNrKCFA5Qw5JjR3yWkzLIhJaM542KnrcvqPnsfYdnaF4MPDuEQhCWqz4PTMhPioWex5z1-EXmj018t2fpc07UXozRDGP_nTWKwHnMfqVO-VqcQrK9V7JSuS-20FWYCk09nAaIOyXrsIh39YBgOeIIolf9zP1wAmOuSKsW4zn-xQLYdIhxfyos-pY7_zBIA2wBkaC0Le-oKCtWkrWW7oF5p8jBI4oazQww886So4zxGmoD5jCkoR9o8wODToJOJLly60KY5_8hHrwbqy383nwCHwb9tHcIa20YkZM930jnDJ49eqWwWM38nFrqjm8SOMcRErCSSULyGANudLe797YVCUh1HZacQEf6CUUnwqThkkJsuB4GDgGNdYXv7CCOZW4yo99zrjOrcHbuqknpnBt3ihmoBf8teQ
+
+
+### Get All Roles
+GET http://localhost:8000/api/role
+Authorization: Bearer {{bearer_token}}
+
+### Get Single Role
+GET http://localhost:8000/api/role/1
+Authorization: Bearer {{bearer_token}}
+
+### Create New Role
+POST http://localhost:8000/api/role
+Authorization: Bearer {{bearer_token}}
+Content-Type: application/json
+
+{
+    "name": "admin"
+}
+
+### Create Role with Guard
+POST http://localhost:8000/api/role
+Authorization: Bearer {{bearer_token}}
+Content-Type: application/json
+
+{
+    "name": "api_user",
+    "guard_name": "api"
+}
+
+### Update Role
+PUT http://localhost:8000/api/role/1
+Authorization: Bearer {{bearer_token}}
+Content-Type: application/json
+
+{
+    "name": "updated_admin"
+}
+
+### Update Role with Guard
+PUT http://localhost:8000/api/role/1
+Authorization: Bearer {{bearer_token}}
+Content-Type: application/json
+
+{
+    "name": "updated_api_user",
+    "guard_name": "api"
+}
+
+### Delete Role
+DELETE http://localhost:8000/api/role/1
+Authorization: Bearer {{bearer_token}}
+
+### Test with Different Role
+POST http://localhost:8000/api/role
+Authorization: Bearer {{bearer_token}}
+Content-Type: application/json
+
+{
+    "name": "user"
+}
+
+POST http://localhost:8000/api/role
+Authorization: Bearer {{bearer_token}}
+Content-Type: application/json
+
+{
+    "name": "moderator"
+}
+
+POST http://localhost:8000/api/role
+Authorization: Bearer {{bearer_token}}
+Content-Type: application/json
+
+{
+    "name": "editor"
+}
+
+### Test Validation - Duplicate Name
+POST http://localhost:8000/api/role
+Authorization: Bearer {{bearer_token}}
+Content-Type: application/json
+
+{
+    "name": "admin"
+}
+
+### Test Validation - Empty Name
+POST http://localhost:8000/api/role
+Authorization: Bearer {{bearer_token}}
+Content-Type: application/json
+
+{
+    "name": ""
+}
+
+### Test Validation - Long Name
+POST http://localhost:8000/api/role
+Authorization: Bearer {{bearer_token}}
+Content-Type: application/json
+
+{
+    "name": "this_is_a_very_long_role_name_that_exceeds_the_maximum_length_limit_of_255_characters_and_should_fail_validation_because_it_is_too_long_for_the_database_field_and_will_cause_an_error_when_trying_to_store_it_in_the_database_table"
+}

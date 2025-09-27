@@ -1,0 +1,219 @@
+### Variables
+@baseUrl = http://localhost:8000
+@apiPrefix = /api
+@contentType = application/json
+
+### Test User Credentials
+@testEmail = test@example.com
+@testPassword = 123123123
+@testName = Test User
+
+### Admin User Credentials  
+@adminEmail = admin@example.com
+@adminPassword = 123123123
+@adminName = Admin User
+
+### ===========================================
+### AUTHENTICATION ENDPOINTS
+### ===========================================
+
+### Register New User
+POST {{baseUrl}}{{apiPrefix}}/auth/register
+Content-Type: {{contentType}}
+
+{
+    "name": "{{testName}}",
+    "email": "{{testEmail}}",
+    "password": "{{testPassword}}",
+    "password_confirmation": "{{testPassword}}"
+}
+
+### Register Admin User
+POST {{baseUrl}}{{apiPrefix}}/auth/register
+Content-Type: {{contentType}}
+
+{
+    "name": "{{adminName}}",
+    "email": "{{adminEmail}}",
+    "password": "{{adminPassword}}",
+    "password_confirmation": "{{adminPassword}}"
+}
+
+### Login User
+POST {{baseUrl}}{{apiPrefix}}/auth/login
+Content-Type: {{contentType}}
+
+{
+    "email": "{{testEmail}}",
+    "password": "{{testPassword}}"
+}
+
+### Login Admin
+POST {{baseUrl}}{{apiPrefix}}/auth/login
+Content-Type: {{contentType}}
+
+{
+    "email": "{{adminEmail}}",
+    "password": "{{adminPassword}}"
+}
+
+### ===========================================
+### TOKEN MANAGEMENT
+### ===========================================
+
+### Get Current User (requires token from login response)
+GET {{baseUrl}}{{apiPrefix}}/auth/me
+Authorization: Bearer {{$dotenv TOKEN}}
+
+### Refresh Token
+POST {{baseUrl}}{{apiPrefix}}/auth/refresh
+Authorization: Bearer {{$dotenv TOKEN}}
+
+### Logout
+POST {{baseUrl}}{{apiPrefix}}/auth/logout
+Authorization: Bearer {{$dotenv TOKEN}}
+
+### ===========================================
+### VALIDATION TESTS
+### ===========================================
+
+### Test Validation - Invalid Email
+POST {{baseUrl}}{{apiPrefix}}/auth/register
+Content-Type: {{contentType}}
+
+{
+    "name": "Test User",
+    "email": "invalid-email",
+    "password": "password",
+    "password_confirmation": "password"
+}
+
+### Test Validation - Password Mismatch
+POST {{baseUrl}}{{apiPrefix}}/auth/register
+Content-Type: {{contentType}}
+
+{
+    "name": "Test User",
+    "email": "test2@example.com",
+    "password": "password",
+    "password_confirmation": "different_password"
+}
+
+### Test Validation - Short Password
+POST {{baseUrl}}{{apiPrefix}}/auth/register
+Content-Type: {{contentType}}
+
+{
+    "name": "Test User",
+    "email": "test3@example.com",
+    "password": "123",
+    "password_confirmation": "123"
+}
+
+### Test Validation - Missing Fields
+POST {{baseUrl}}{{apiPrefix}}/auth/register
+Content-Type: {{contentType}}
+
+{
+    "name": "Test User"
+}
+
+### ===========================================
+### LOGIN VALIDATION TESTS
+### ===========================================
+
+### Test Login - Invalid Credentials
+POST {{baseUrl}}{{apiPrefix}}/auth/login
+Content-Type: {{contentType}}
+
+{
+    "email": "{{testEmail}}",
+    "password": "wrong_password"
+}
+
+### Test Login - Non-existent User
+POST {{baseUrl}}{{apiPrefix}}/auth/login
+Content-Type: {{contentType}}
+
+{
+    "email": "nonexistent@example.com",
+    "password": "password"
+}
+
+### Test Login - Invalid Email Format
+POST {{baseUrl}}{{apiPrefix}}/auth/login
+Content-Type: {{contentType}}
+
+{
+    "email": "invalid-email",
+    "password": "password"
+}
+
+### ===========================================
+### PROTECTED ENDPOINT TESTS
+### ===========================================
+
+### Test Protected Route - Without Token
+GET {{baseUrl}}{{apiPrefix}}/auth/me
+
+### Test Protected Route - Invalid Token
+GET {{baseUrl}}{{apiPrefix}}/auth/me
+Authorization: Bearer invalid_token_here
+
+### Test Protected Route - Expired Token
+GET {{baseUrl}}{{apiPrefix}}/auth/me
+Authorization: Bearer expired_token_here
+
+### ===========================================
+### BULK OPERATIONS
+### ===========================================
+
+### Register Multiple Users
+POST {{baseUrl}}{{apiPrefix}}/auth/register
+Content-Type: {{contentType}}
+
+{
+    "name": "User 1",
+    "email": "user1@example.com",
+    "password": "password",
+    "password_confirmation": "password"
+}
+
+###
+
+POST {{baseUrl}}{{apiPrefix}}/auth/register
+Content-Type: {{contentType}}
+
+{
+    "name": "User 2",
+    "email": "user2@example.com",
+    "password": "password",
+    "password_confirmation": "password"
+}
+
+###
+
+POST {{baseUrl}}{{apiPrefix}}/auth/register
+Content-Type: {{contentType}}
+
+{
+    "name": "User 3",
+    "email": "user3@example.com",
+    "password": "password",
+    "password_confirmation": "password"
+}
+
+### ===========================================
+### ENVIRONMENT VARIABLES
+### ===========================================
+
+### Set Token Variable (run after successful login)
+# After login, copy the token from response and set it as environment variable
+# TOKEN=your_actual_token_here
+
+### Use Token in Subsequent Requests
+GET {{baseUrl}}{{apiPrefix}}/auth/me
+Authorization: Bearer {{$dotenv TOKEN}}
+
+POST {{baseUrl}}{{apiPrefix}}/auth/logout
+Authorization: Bearer {{$dotenv TOKEN}}
