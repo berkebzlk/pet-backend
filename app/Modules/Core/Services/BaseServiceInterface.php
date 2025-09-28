@@ -4,6 +4,8 @@ namespace App\Modules\Core\Services;
 
 interface BaseServiceInterface
 {
+    public function getModelName(): string;
+
     /**
      * Get all records
      */

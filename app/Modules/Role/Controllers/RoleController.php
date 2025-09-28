@@ -22,7 +22,7 @@ class RoleController extends Controller
 
         return ResponseHelper::success(new RoleResource($role), HttpStatusEnum::CREATED->value, __('crud.created', ['attribute' => $this->roleService->getModelName()]));
     }
-    
+
     public function index()
     {
         $roles = $this->roleService->index();
