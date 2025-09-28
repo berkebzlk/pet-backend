@@ -18,9 +18,6 @@ class UserController extends Controller
         private UserServiceInterface $userService
     ) {}
 
-    /**
-     * Display a listing of users
-     */
     public function index(): JsonResponse
     {
         $users = $this->userService->index();
@@ -28,9 +25,6 @@ class UserController extends Controller
         return ResponseHelper::success(UserResource::collection($users));
     }
 
-    /**
-     * Store a newly created user
-     */
     public function store(StoreUserRequest $request): JsonResponse
     {
         $user = $this->userService->store($request->validated());
@@ -38,9 +32,6 @@ class UserController extends Controller
         return ResponseHelper::success(new UserResource($user), HttpStatusEnum::CREATED->value, __('crud.created', ['attribute' => $this->userService->getModelName()]));
     }
 
-    /**
-     * Display the specified user
-     */
     public function show(int $id): JsonResponse
     {
         $user = $this->userService->show($id);
@@ -48,9 +39,6 @@ class UserController extends Controller
         return ResponseHelper::success(new UserResource($user));
     }
 
-    /**
-     * Update the specified user
-     */
     public function update(UpdateUserRequest $request, int $id): JsonResponse
     {
         $user = $this->userService->update($id, $request->validated());
@@ -58,9 +46,6 @@ class UserController extends Controller
         return ResponseHelper::success(new UserResource($user), HttpStatusEnum::OK->value, __('crud.updated', ['attribute' => $this->userService->getModelName()]));
     }
 
-    /**
-     * Delete the specified user
-     */
     public function delete(int $id): JsonResponse
     {
         $this->userService->delete($id);
@@ -68,9 +53,6 @@ class UserController extends Controller
         return ResponseHelper::success(null, HttpStatusEnum::OK->value, __('crud.deleted', ['attribute' => $this->userService->getModelName()]));
     }
 
-    /**
-     * Get current user profile
-     */
     public function profile(Request $request): JsonResponse
     {
         $user = $this->userService->show($request->user()->id);

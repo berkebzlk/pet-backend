@@ -2,8 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('api')->group(function () {
-    Route::get('/test', function () {
-        return response()->json(['message' => 'Hello World']);
-    });
+Route::get('/healthcheck', function () {
+    return [
+        'status' => 'up',
+        'services' => [
+            'database' => 'up',
+            'redis' => 'up',
+        ],
+    ];
 });
