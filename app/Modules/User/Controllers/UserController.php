@@ -3,9 +3,9 @@
 namespace App\Modules\User\Controllers;
 
 use App\Modules\Core\Helpers\ResponseHelper;
-use App\Modules\User\Requests\StoreUserRequest;
-use App\Modules\User\Requests\UpdateUserRequest;
-use App\Modules\User\Resources\UserResource;
+use App\Modules\User\Payload\Requests\StoreUserRequest;
+use App\Modules\User\Payload\Requests\UpdateUserRequest;
+use App\Modules\User\Payload\Resources\UserResource;
 use App\Modules\User\Services\UserServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

@@ -4,9 +4,9 @@ namespace App\Modules\Role\Controllers;
 
 use App\Modules\Core\Enums\HttpStatusEnum;
 use App\Modules\Core\Helpers\ResponseHelper;
-use App\Modules\Role\Requests\StoreRoleRequest;
-use App\Modules\Role\Requests\UpdateRoleRequest;
-use App\Modules\Role\Resources\RoleResource;
+use App\Modules\Role\Payload\Requests\StoreRoleRequest;
+use App\Modules\Role\Payload\Requests\UpdateRoleRequest;
+use App\Modules\Role\Payload\Resources\RoleResource;
 use App\Modules\Role\Services\RoleServiceInterface;
 use Illuminate\Routing\Controller;
 

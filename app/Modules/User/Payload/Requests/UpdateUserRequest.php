@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Modules\User\Requests;
+namespace App\Modules\User\Payload\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class StoreUserRequest extends FormRequest
+class UpdateUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -20,9 +21,15 @@ class StoreUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:6', 'confirmed'],
+            'name' => ['sometimes', 'string', 'max:255'],
+            'email' => [
+                'sometimes',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users')->ignore($this->route('user'))
+            ],
+            'password' => ['sometimes', 'string', 'min:6', 'confirmed'],
         ];
     }
 
@@ -32,12 +39,10 @@ class StoreUserRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => __('validation.required'),
+            'name.string' => __('validation.string'),
             'name.max' => __('validation.max'),
-            'email.required' => __('validation.required'),
             'email.email' => __('validation.email'),
             'email.unique' => __('validation.unique'),
-            'password.required' => __('validation.required'),
             'password.min' => __('validation.min'),
             'password.confirmed' => __('validation.confirmed'),
         ];
