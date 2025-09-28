@@ -8,6 +8,7 @@ return [
     'max' => ':attribute alanı en fazla :max karakter olmalıdır',
     'min' => ':attribute alanı en az :min karakter olmalıdır',
     'confirmed' => ':attribute alanı eşleşmiyor',
+    'invalid' => 'Bazı alanlar geçersiz',
 
     'attributes' => [
         'id' => 'ID',

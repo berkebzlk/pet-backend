@@ -2,6 +2,7 @@
 
 namespace App\Modules\User\Controllers;
 
+use App\Modules\Core\Enums\HttpStatusEnum;
 use App\Modules\Core\Helpers\ResponseHelper;
 use App\Modules\User\Payload\Requests\StoreUserRequest;
 use App\Modules\User\Payload\Requests\UpdateUserRequest;
@@ -34,7 +35,7 @@ class UserController extends Controller
     {
         $user = $this->userService->store($request->validated());
 
-        return ResponseHelper::success(new UserResource($user), 201, __('user.created_successfully'));
+        return ResponseHelper::success(new UserResource($user), HttpStatusEnum::CREATED->value, __('crud.created', ['attribute' => $this->userService->getModelName()]));
     }
 
     /**
@@ -44,7 +45,7 @@ class UserController extends Controller
     {
         $user = $this->userService->show($id);
 
-        return ResponseHelper::success($user);
+        return ResponseHelper::success(new UserResource($user));
     }
 
     /**
@@ -54,7 +55,7 @@ class UserController extends Controller
     {
         $user = $this->userService->update($id, $request->validated());
 
-        return ResponseHelper::success($user, 200, __('user.updated_successfully'));
+        return ResponseHelper::success(new UserResource($user), HttpStatusEnum::OK->value, __('crud.updated', ['attribute' => $this->userService->getModelName()]));
     }
 
     /**
@@ -64,7 +65,7 @@ class UserController extends Controller
     {
         $this->userService->delete($id);
 
-        return ResponseHelper::success(null, 200, __('user.deleted_successfully'));
+        return ResponseHelper::success(null, HttpStatusEnum::OK->value, __('crud.deleted', ['attribute' => $this->userService->getModelName()]));
     }
 
     /**
@@ -72,18 +73,8 @@ class UserController extends Controller
      */
     public function profile(Request $request): JsonResponse
     {
-        $user = $this->userService->getCurrentUser($request->user()->id);
+        $user = $this->userService->show($request->user()->id);
 
-        return ResponseHelper::success($user);
-    }
-
-    /**
-     * Update current user profile
-     */
-    public function updateProfile(UpdateUserRequest $request): JsonResponse
-    {
-        $user = $this->userService->updateCurrentUser($request->user()->id, $request->validated());
-
-        return ResponseHelper::success($user, 200, __('user.profile_updated_successfully'));
+        return ResponseHelper::success(new UserResource($user));
     }
 }

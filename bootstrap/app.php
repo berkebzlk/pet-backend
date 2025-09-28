@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Core\Enums\HttpStatusEnum;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -20,7 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             return response()->json([
                 'success'     => false,
                 'error_code' => 'VALIDATION_ERROR',
-                'message'    => 'Some fields are invalid.',
+                'message'    => __('validation.invalid'),
                 'errors'     => $e->errors(), // field => [messages]
             ], \Symfony\Component\HttpFoundation\Response::HTTP_UNPROCESSABLE_ENTITY);
         });
@@ -30,7 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
             return response()->json([
                 'success'     => false,
                 'error_code' => 'AUTH_ERROR',
-                'message'    => 'Unauthenticated.',
+                'message'    => __('http.' . HttpStatusEnum::UNAUTHORIZED->value),
             ], \Symfony\Component\HttpFoundation\Response::HTTP_UNAUTHORIZED);
         });
 
@@ -39,7 +40,7 @@ return Application::configure(basePath: dirname(__DIR__))
             return response()->json([
                 'success'     => false,
                 'error_code' => 'FORBIDDEN',
-                'message'    => 'You are not allowed to perform this action.',
+                'message'    => __('http.' . HttpStatusEnum::FORBIDDEN->value),
             ], \Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN);
         });
 
@@ -48,17 +49,25 @@ return Application::configure(basePath: dirname(__DIR__))
             return response()->json([
                 'success'     => false,
                 'error_code' => 'NOT_FOUND',
-                'message'    => 'The requested resource was not found.',
+                'message'    => __('http.' . HttpStatusEnum::NOT_FOUND->value),
             ], \Symfony\Component\HttpFoundation\Response::HTTP_NOT_FOUND);
         });
 
-        // HTTP errors (route not found, method not allowed, vs.)
-        $exceptions->renderable(function (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+        // HTTP errors - farklı exception türleri için
+        $exceptions->renderable(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e) {
             return response()->json([
-                'success'     => false,
-                'error_code' => 'HTTP_ERROR',
-                'message'    => $e->getMessage() ?: 'HTTP Error occurred.',
-            ], $e->getStatusCode());
+                'success' => false,
+                'error_code' => 'NOT_FOUND',
+                'message' => __('http.' . HttpStatusEnum::NOT_FOUND->value),
+            ], HttpStatusEnum::NOT_FOUND->value);
+        });
+
+        $exceptions->renderable(function (\Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException $e) {
+            return response()->json([
+                'success' => false,
+                'error_code' => 'METHOD_NOT_ALLOWED',
+                'message' => __('http.' . HttpStatusEnum::METHOD_NOT_ALLOWED->value),
+            ], HttpStatusEnum::METHOD_NOT_ALLOWED->value);
         });
 
         // General / unexpected exceptions
@@ -66,7 +75,7 @@ return Application::configure(basePath: dirname(__DIR__))
             $response = [
                 'success'     => false,
                 'error_code' => 'INTERNAL_ERROR',
-                'message'    => 'An unexpected error occurred.',
+                'message'    => __('http.' . HttpStatusEnum::INTERNAL_SERVER_ERROR->value),
             ];
 
             // Prod değilse detayları ekle
