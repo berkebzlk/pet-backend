@@ -15,12 +15,7 @@ class UserRepositoryEloquent extends BaseRepositoryEloquent implements UserRepos
 
     public function revokeAllTokens(int $userId)
     {
-        $user = $this->findById($userId);
-        if ($user) {
-            return false;
-        }
-
-        $user->tokens()->delete();
+        $this->model->where('id', $userId)->tokens()->delete();
         return true;
     }
 }
