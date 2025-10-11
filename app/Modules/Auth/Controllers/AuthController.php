@@ -7,6 +7,8 @@ use App\Modules\Auth\Requests\RegisterRequest;
 use App\Modules\Auth\Resources\AuthResource;
 use App\Modules\Auth\Services\AuthService;
 use App\Modules\Core\Helpers\ResponseHelper;
+use Auth;
+use Http;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -19,9 +21,27 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request): JsonResponse
     {
-        $result = $this->authService->login($request->validated());
+        if (!Auth::attempt($request->only('email', 'password'))) {
+            return response()->json([
+                'message' => 'Invalid login details'
+            ], 401);
+        }
+        
+        $response = Http::asForm()->post(route('passport.token'), [
+            'grant_type' => 'password',
+            'client_id' => env('PASSWORD_CLIENT_ID'),
+            'client_secret' => env('PASSWORD_CLIENT_SECRET'),
+            'username' => $request->email,
+            'password' => $request->password,
+            'scope' => '',
+        ]);
+        
+        dd(2);
+        return $response->json();
 
-        return ResponseHelper::success(new AuthResource($result), 200, __('auth.login_successful'));
+        // $result = $this->authService->login($request->validated());
+
+        // return ResponseHelper::success(new AuthResource($result), 200, __('auth.login_successful'));
     }
 
     public function logout(Request $request): JsonResponse
@@ -35,7 +55,7 @@ class AuthController extends Controller
     {
         $result = $this->authService->register($request->validated());
 
-        return ResponseHelper::success($result, 201, __('auth.register_successful'));
+        return ResponseHelper::success(new AuthResource($result), 201, __('auth.register_successful'));
     }
 
     public function me(Request $request): JsonResponse
@@ -49,6 +69,17 @@ class AuthController extends Controller
     {
         $result = $this->authService->refreshToken($request->user());
 
-        return ResponseHelper::success($result, 200, __('auth.token_refreshed'));
+        return ResponseHelper::success(new AuthResource($result), 200, __('auth.token_refreshed'));
+    }
+
+    public function refreshWithToken(Request $request): JsonResponse
+    {
+        $request->validate([
+            'refresh_token' => 'required|string'
+        ]);
+
+        $result = $this->authService->refreshTokenWithRefreshToken($request->refresh_token);
+
+        return ResponseHelper::success(new AuthResource($result), 200, __('auth.token_refreshed'));
     }
 }
