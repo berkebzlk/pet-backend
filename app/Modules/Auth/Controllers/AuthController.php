@@ -19,29 +19,11 @@ class AuthController extends Controller
         private AuthService $authService
     ) {}
 
-    public function login(LoginRequest $request): JsonResponse
+    public function login(LoginRequest $request)
     {
-        if (!Auth::attempt($request->only('email', 'password'))) {
-            return response()->json([
-                'message' => 'Invalid login details'
-            ], 401);
-        }
-        
-        $response = Http::asForm()->post(route('passport.token'), [
-            'grant_type' => 'password',
-            'client_id' => env('PASSWORD_CLIENT_ID'),
-            'client_secret' => env('PASSWORD_CLIENT_SECRET'),
-            'username' => $request->email,
-            'password' => $request->password,
-            'scope' => '',
-        ]);
-        
-        dd(2);
-        return $response->json();
+        $result = $this->authService->login($request->validated());
 
-        // $result = $this->authService->login($request->validated());
-
-        // return ResponseHelper::success(new AuthResource($result), 200, __('auth.login_successful'));
+        return ResponseHelper::success(new AuthResource($result), 200, __('auth.login_successful'));
     }
 
     public function logout(Request $request): JsonResponse
@@ -55,7 +37,7 @@ class AuthController extends Controller
     {
         $result = $this->authService->register($request->validated());
 
-        return ResponseHelper::success(new AuthResource($result), 201, __('auth.register_successful'));
+        return ResponseHelper::success(null, 201, __('auth.register_successful'));
     }
 
     public function me(Request $request): JsonResponse
