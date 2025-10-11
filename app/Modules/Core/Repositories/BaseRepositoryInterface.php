@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 interface BaseRepositoryInterface
 {
     public function getModel(): Model;
+    public function getQuery(): \Illuminate\Database\Eloquent\Builder;
     public function create(array $data);
     public function findAll();
     public function findById(int $id);

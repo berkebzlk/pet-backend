@@ -3,8 +3,8 @@
 namespace App\Modules\Role\Repositories\Impl;
 
 use App\Modules\Core\Repositories\Impl\BaseRepositoryEloquent;
+use App\Modules\Role\Models\Role;
 use App\Modules\Role\Repositories\RoleRepositoryInterface;
-use Spatie\Permission\Models\Role;
 
 class RoleRepository extends BaseRepositoryEloquent implements RoleRepositoryInterface
 {

@@ -6,10 +6,7 @@ interface BaseServiceInterface
 {
     public function getModelName(): string;
 
-    /**
-     * Get all records
-     */
-    public function index();
+    public function index(array $requestData = []);
 
     /**
      * Get single record by ID

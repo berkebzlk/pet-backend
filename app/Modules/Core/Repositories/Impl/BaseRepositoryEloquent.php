@@ -19,6 +19,11 @@ abstract class BaseRepositoryEloquent implements BaseRepositoryInterface
         return $this->model;
     }
 
+    public function getQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return $this->model->newQuery();
+    }
+
     public function findById(int $id)
     {
         return $this->model->find($id);
