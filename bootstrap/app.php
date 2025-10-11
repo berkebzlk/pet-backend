@@ -5,6 +5,27 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
+function createResponse($error_code, $message, $errors = [])
+{
+    return [
+        'success'     => false,
+        'error_code' => $error_code,
+        'message' => $message,
+        'errors' => $errors,
+    ];
+}
+
+function addExceptionDetails($response, $e)
+{
+    $response['exception'] = class_basename($e);
+    $response['file']      = $e->getFile();
+    $response['line']      = $e->getLine();
+    $response['trace']     = $e->getTrace();
+    $response['message']   = $e->getMessage();
+
+    return $response;
+}
+
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__ . '/../routes/web.php',
@@ -18,73 +39,75 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         // Validation Exception
         $exceptions->renderable(function (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success'     => false,
-                'error_code' => 'VALIDATION_ERROR',
-                'message'    => __('validation.invalid'),
-                'errors'     => $e->errors(), // field => [messages]
-            ], \Symfony\Component\HttpFoundation\Response::HTTP_UNPROCESSABLE_ENTITY);
+            $response = createResponse('VALIDATION_ERROR', __('validation.invalid'), $e->errors());
+
+            if (!app()->isProduction()) {
+                $response = addExceptionDetails($response, $e);
+            }
+
+            return response()->json($response, \Symfony\Component\HttpFoundation\Response::HTTP_UNPROCESSABLE_ENTITY);
         });
 
         // Auth Exception
         $exceptions->renderable(function (\Illuminate\Auth\AuthenticationException $e) {
-            return response()->json([
-                'success'     => false,
-                'error_code' => 'AUTH_ERROR',
-                'message'    => __('http.' . HttpStatusEnum::UNAUTHORIZED->value),
-            ], \Symfony\Component\HttpFoundation\Response::HTTP_UNAUTHORIZED);
+            $response = createResponse('AUTH_ERROR', __('http.' . HttpStatusEnum::UNAUTHORIZED->value));
+
+            if (!app()->isProduction()) {
+                $response = addExceptionDetails($response, $e);
+            }
+
+            return response()->json($response, \Symfony\Component\HttpFoundation\Response::HTTP_UNAUTHORIZED);
         });
 
         // Forbidden (authorization)
         $exceptions->renderable(function (\Illuminate\Auth\Access\AuthorizationException $e) {
-            return response()->json([
-                'success'     => false,
-                'error_code' => 'FORBIDDEN',
-                'message'    => __('http.' . HttpStatusEnum::FORBIDDEN->value),
-            ], \Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN);
+            $response = createResponse('FORBIDDEN', __('http.' . HttpStatusEnum::FORBIDDEN->value));
+
+            if (!app()->isProduction()) {
+                $response = addExceptionDetails($response, $e);
+            }
+
+            return response()->json($response, \Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN);
         });
 
         // Model not found
         $exceptions->renderable(function (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json([
-                'success'     => false,
-                'error_code' => 'NOT_FOUND',
-                'message'    => __('http.' . HttpStatusEnum::NOT_FOUND->value),
-            ], \Symfony\Component\HttpFoundation\Response::HTTP_NOT_FOUND);
+            $response = createResponse('NOT_FOUND', __('http.' . HttpStatusEnum::NOT_FOUND->value));
+
+            if (!app()->isProduction()) {
+                $response = addExceptionDetails($response, $e);
+            }
+
+            return response()->json($response, \Symfony\Component\HttpFoundation\Response::HTTP_NOT_FOUND);
         });
 
         // HTTP errors - farklı exception türleri için
         $exceptions->renderable(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e) {
-            return response()->json([
-                'success' => false,
-                'error_code' => 'NOT_FOUND',
-                'message' => __('http.' . HttpStatusEnum::NOT_FOUND->value),
-            ], HttpStatusEnum::NOT_FOUND->value);
+            $response = createResponse('NOT_FOUND', __('http.' . HttpStatusEnum::NOT_FOUND->value));
+
+            if (!app()->isProduction()) {
+                $response = addExceptionDetails($response, $e);
+            }
+
+            return response()->json($response, HttpStatusEnum::NOT_FOUND->value);
         });
 
         $exceptions->renderable(function (\Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException $e) {
-            return response()->json([
-                'success' => false,
-                'error_code' => 'METHOD_NOT_ALLOWED',
-                'message' => __('http.' . HttpStatusEnum::METHOD_NOT_ALLOWED->value),
-            ], HttpStatusEnum::METHOD_NOT_ALLOWED->value);
+            $response = createResponse('METHOD_NOT_ALLOWED', __('http.' . HttpStatusEnum::METHOD_NOT_ALLOWED->value));
+
+            if (!app()->isProduction()) {
+                $response = addExceptionDetails($response, $e);
+            }
+
+            return response()->json($response, HttpStatusEnum::METHOD_NOT_ALLOWED->value);
         });
 
         // General / unexpected exceptions
         $exceptions->renderable(function (\Throwable $e) {
-            $response = [
-                'success'     => false,
-                'error_code' => 'INTERNAL_ERROR',
-                'message'    => __('http.' . HttpStatusEnum::INTERNAL_SERVER_ERROR->value),
-            ];
+            $response = createResponse('INTERNAL_ERROR', __('http.' . HttpStatusEnum::INTERNAL_SERVER_ERROR->value));
 
-            // Prod değilse detayları ekle
             if (!app()->isProduction()) {
-                $response['exception'] = class_basename($e);
-                $response['file']      = $e->getFile();
-                $response['line']      = $e->getLine();
-                $response['trace']     = $e->getTrace();
-                $response['message']   = $e->getMessage(); // gerçek mesaj da gelsin
+                $response = addExceptionDetails($response, $e);
             }
 
             return response()->json($response, \Symfony\Component\HttpFoundation\Response::HTTP_INTERNAL_SERVER_ERROR);
