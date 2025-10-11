@@ -1,7 +1,7 @@
 <?php
 
+use App\Modules\Role\Models\Role;
 use App\Modules\User\Models\User;
-use Spatie\Permission\Models\Role;
 
 return [
     Role::class => 'Rol',
