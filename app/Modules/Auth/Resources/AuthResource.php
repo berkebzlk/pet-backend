@@ -2,7 +2,7 @@
 
 namespace App\Modules\Auth\Resources;
 
-use App\Modules\User\Resources\UserResource;
+use App\Modules\User\Payload\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -15,7 +15,10 @@ class AuthResource extends JsonResource
     {
         return [
             'user' => new UserResource($this['user']),
-            'token' => $this['token'],
+            'access_token' => $this['access_token'],
+            'refresh_token' => $this['refresh_token'],
+            'token_type' => $this['token_type'],
+            'expires_in' => $this['expires_in'],
         ];
     }
 }
