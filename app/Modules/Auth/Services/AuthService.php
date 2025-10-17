@@ -22,8 +22,8 @@ class AuthService
         // Use Password Grant to obtain both access and refresh tokens
         $response = Http::asForm()->post(route('passport.token'), [
             'grant_type' => 'password',
-            'client_id' => env('PASSWORD_CLIENT_ID'),
-            'client_secret' => env('PASSWORD_CLIENT_SECRET'),
+            'client_id' => env('PASSPORT_PASSWORD_CLIENT_ID'),
+            'client_secret' => env('PASSPORT_PASSWORD_CLIENT_SECRET'),
             'username' => $credentials['email'],
             'password' => $credentials['password'],
             'scope' => '*',
