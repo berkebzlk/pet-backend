@@ -4,6 +4,7 @@ use App\Modules\Core\Enums\HttpStatusEnum;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use App\Modules\Auth\Exceptions\ExpiredAccessTokenException;
 
 function createResponse($error_code, $message, $errors = [])
 {
@@ -34,7 +35,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Register API middleware to pre-detect expired tokens (run before auth:api)
+        $middleware->prependToGroup('api', [\App\Modules\Auth\Middleware\CheckExpiredAccessToken::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Validation Exception
@@ -51,6 +53,17 @@ return Application::configure(basePath: dirname(__DIR__))
         // Auth Exception
         $exceptions->renderable(function (\Illuminate\Auth\AuthenticationException $e) {
             $response = createResponse('AUTH_ERROR', __('http.' . HttpStatusEnum::UNAUTHORIZED->value));
+
+            if (!app()->isProduction()) {
+                $response = addExceptionDetails($response, $e);
+            }
+
+            return response()->json($response, \Symfony\Component\HttpFoundation\Response::HTTP_UNAUTHORIZED);
+        });
+
+        // Custom expired token response (401 with specific error_code)
+        $exceptions->renderable(function (ExpiredAccessTokenException $e) {
+            $response = createResponse('TOKEN_EXPIRED', __('http.' . HttpStatusEnum::UNAUTHORIZED->value));
 
             if (!app()->isProduction()) {
                 $response = addExceptionDetails($response, $e);
