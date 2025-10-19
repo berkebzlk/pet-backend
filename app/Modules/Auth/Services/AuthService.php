@@ -90,61 +90,28 @@ class AuthService
         return $user;
     }
 
-    /**
-     * Refresh access token using refresh token
-     */
-    public function refreshTokenWithRefreshToken(string $refreshToken): array
+    public function refresh(string $refreshToken): array
     {
-        // Find the refresh token in database
-        $refreshTokenModel = \Laravel\Passport\RefreshToken::where('id', $refreshToken)->first();
+        $response = Http::asForm()->post(route('passport.token'), [
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $refreshToken,
+            'client_id' => env('PASSPORT_PASSWORD_CLIENT_ID'),
+            'client_secret' => env('PASSPORT_PASSWORD_CLIENT_SECRET'),
+            'scope' => '*',
+        ]);
+        dd($response->json());
 
-        if (!$refreshTokenModel || $refreshTokenModel->revoked) {
-            throw new \Exception('Invalid refresh token', 401);
+        if (!$response->successful()) {
+            throw new \Exception('Unable to refresh access token', $response->status());
         }
 
-        // Get the access token associated with this refresh token
-        $accessToken = $refreshTokenModel->accessToken;
-
-        if ($accessToken->revoked) {
-            throw new \Exception('Access token is revoked', 401);
-        }
-
-        // Get the user
-        $user = $accessToken->user;
-
-        // Revoke the old access token and refresh token
-        $accessToken->revoke();
-        $refreshTokenModel->revoke();
-
-        // Create new tokens
-        $tokenResult = $user->createToken('auth-token');
+        $data = $response->json();
 
         return [
-            'user' => $user,
-            'access_token' => $tokenResult->accessToken,
-            'refresh_token' => $tokenResult->refreshToken,
-            'token_type' => 'Bearer',
-            'expires_at' => $tokenResult->token->expires_at,
-        ];
-    }
-
-    /**
-     * Refresh user token (legacy method - requires authentication)
-     */
-    public function refreshToken(User $user): array
-    {
-        // Revoke current token
-        $user->currentAccessToken()->revoke();
-
-        // Create new token
-        $tokenResult = $user->createToken('auth-token');
-
-        return [
-            'user' => $user,
-            'access_token' => $tokenResult->accessToken,
-            'refresh_token' => $tokenResult->refreshToken,
-            'token_type' => 'Bearer',
-            'expires_at' => $tokenResult->token->expires_at,
+            'access_token' => $data['access_token'],
+            'refresh_token' => $data['refresh_token'] ?? null,
+            'token_type' => $data['token_type'] ?? 'Bearer',
+            'expires_in' => $data['expires_in'] ?? null,
         ];
     }
 }

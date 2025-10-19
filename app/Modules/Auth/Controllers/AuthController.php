@@ -49,18 +49,11 @@ class AuthController extends Controller
 
     public function refresh(Request $request): JsonResponse
     {
-        $result = $this->authService->refreshToken($request->user());
-
-        return ResponseHelper::success(new AuthResource($result), 200, __('auth.token_refreshed'));
-    }
-
-    public function refreshWithToken(Request $request): JsonResponse
-    {
         $request->validate([
             'refresh_token' => 'required|string'
         ]);
 
-        $result = $this->authService->refreshTokenWithRefreshToken($request->refresh_token);
+        $result = $this->authService->refresh($request['refresh_token']);
 
         return ResponseHelper::success(new AuthResource($result), 200, __('auth.token_refreshed'));
     }
