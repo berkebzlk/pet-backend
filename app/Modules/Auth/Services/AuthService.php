@@ -6,6 +6,7 @@ use App\Modules\User\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Laravel\Passport\Token;
 
 class AuthService
 {
@@ -33,14 +34,29 @@ class AuthService
             throw new \Exception('Unable to obtain OAuth tokens', 500);
         }
 
-        $tokenPayload = $response->json();
+        $responseData = $response->json();
+        
+        $parts = explode('.', $responseData['access_token']);
+        
+        $payloadB64 = strtr($parts[1], '-_', '+/');
+        $payloadB64 .= str_repeat('=', (4 - strlen($payloadB64) % 4) % 4);
+        
+        $payloadJson = base64_decode($payloadB64, true);
+        
+        $payload = json_decode($payloadJson, true);
+        
+        // revoke old tokens (currently this system supports login from only one device)
+        Token::where('user_id', $user->id)
+            ->where('id', '!=', $payload['jti'])
+            ->where('revoked', 0)
+            ->update(['revoked' => true]);
 
         return [
             'user' => $user,
-            'access_token' => $tokenPayload['access_token'] ?? null,
-            'refresh_token' => $tokenPayload['refresh_token'] ?? null,
-            'token_type' => $tokenPayload['token_type'] ?? 'Bearer',
-            'expires_in' => $tokenPayload['expires_in'] ?? null,
+            'access_token' => $responseData['access_token'],
+            'refresh_token' => $responseData['refresh_token'] ?? null,
+            'token_type' => $responseData['token_type'] ?? 'Bearer',
+            'expires_in' => $responseData['expires_in'] ?? null,
         ];
     }
 
