@@ -10,5 +10,3 @@ Route::prefix('role')->group(function () {
     Route::put('/{id}', [RoleController::class, 'update']);
     Route::delete('/{id}', [RoleController::class, 'delete']);
 });
-
-

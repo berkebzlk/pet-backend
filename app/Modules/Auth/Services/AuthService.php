@@ -35,16 +35,16 @@ class AuthService
         }
 
         $responseData = $response->json();
-        
+
         $parts = explode('.', $responseData['access_token']);
-        
+
         $payloadB64 = strtr($parts[1], '-_', '+/');
         $payloadB64 .= str_repeat('=', (4 - strlen($payloadB64) % 4) % 4);
-        
+
         $payloadJson = base64_decode($payloadB64, true);
-        
+
         $payload = json_decode($payloadJson, true);
-        
+
         // revoke old tokens (currently this system supports login from only one device)
         Token::where('user_id', $user->id)
             ->where('id', '!=', $payload['jti'])
