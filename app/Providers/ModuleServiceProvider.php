@@ -58,12 +58,22 @@ class ModuleServiceProvider extends ServiceProvider
             if (File::isDirectory($configPath)) {
                 foreach (File::files($configPath) as $file) {
                     $filename = pathinfo($file, PATHINFO_FILENAME);
-                    
+
                     // Load with namespace: 'role::role' example: app/Modules/Role/Config/role.php => 'role::role'
                     $this->mergeConfigFrom($file->getPathname(), strtolower($moduleName) . '::' . $filename);
                 }
             }
         }
+
+        // Global Factory Discovery
+        \Illuminate\Database\Eloquent\Factories\Factory::guessFactoryNamesUsing(function (string $modelName) {
+            // App\Modules\User\Models\User -> App\Modules\User\Database\Factories\UserFactory
+            return str_replace(
+                ['Models\\', '\\Models'],
+                ['Database\\Factories\\', ''],
+                $modelName
+            ) . 'Factory';
+        });
     }
 
     private function registerRoutes($moduleName)

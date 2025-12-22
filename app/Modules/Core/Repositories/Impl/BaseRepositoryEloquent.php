@@ -41,7 +41,12 @@ abstract class BaseRepositoryEloquent implements BaseRepositoryInterface
 
     public function update(int $id, array $data)
     {
-        $this->model->update($data);
+        $record = $this->model->find($id);
+        if ($record) {
+            $record->update($data);
+            return $record;
+        }
+        return null;
     }
 
     public function delete(int $id)
