@@ -9,7 +9,7 @@ use App\Modules\Auth\Exceptions\ExpiredAccessTokenException;
 function createResponse($error_code, $message, $errors = [])
 {
     return [
-        'success'     => false,
+        'success' => false,
         'error_code' => $error_code,
         'message' => $message,
         'errors' => $errors,
@@ -19,10 +19,10 @@ function createResponse($error_code, $message, $errors = [])
 function addExceptionDetails($response, $e)
 {
     $response['exception'] = class_basename($e);
-    $response['file']      = $e->getFile();
-    $response['line']      = $e->getLine();
-    $response['trace']     = $e->getTrace();
-    $response['message']   = $e->getMessage();
+    $response['file'] = $e->getFile();
+    $response['line'] = $e->getLine();
+    $response['trace'] = $e->getTrace();
+    $response['message'] = $e->getMessage();
 
     return $response;
 }
@@ -35,6 +35,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Ensure CORS middleware is active
+        $middleware->appendToGroup('api', \Illuminate\Http\Middleware\HandleCors::class);
+
         // Register API middleware to pre-detect expired tokens (run before auth:api)
         $middleware->prependToGroup('api', [\App\Modules\Auth\Middleware\CheckExpiredAccessToken::class]);
     })
