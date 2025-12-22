@@ -40,7 +40,7 @@ class PetService extends BaseService implements PetServiceInterface
             $data['image'] = $path;
         }
 
-        // Ensure user_id is set if not present (usually handled by controller but good for safety)
+        // Ensure user_id is set if not present
         if (!isset($data['user_id'])) {
             $data['user_id'] = auth()->id();
         }

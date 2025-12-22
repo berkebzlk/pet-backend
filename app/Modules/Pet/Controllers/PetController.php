@@ -22,6 +22,14 @@ class PetController extends Controller
     public function index(Request $request)
     {
         $data = $request->all();
+        $pets = $this->petService->index($data);
+
+        return ResponseHelper::success(new PaginatedResource($pets, PetResource::class));
+    }
+
+    public function myPets(Request $request)
+    {
+        $data = $request->all();
         $data['filters']['user_id'] = $request->user()->id;
 
         $pets = $this->petService->index($data);
