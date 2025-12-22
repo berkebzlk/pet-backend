@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Modules\Pet\Database\Seeders\PetSeeder;
 use App\Modules\Role\Database\Seeders\RoleSeeder;
 use App\Modules\User\Models\User;
 use Hash;
@@ -24,6 +25,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             RoleSeeder::class,
+            PetSeeder::class,
         ]);
     }
 }
