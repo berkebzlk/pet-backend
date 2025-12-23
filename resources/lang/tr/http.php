@@ -11,6 +11,7 @@ return [
     HttpStatusEnum::FORBIDDEN->value => 'Erişim Yasağı',
     HttpStatusEnum::NOT_FOUND->value => ':attribute bulunamadı',
     HttpStatusEnum::METHOD_NOT_ALLOWED->value => 'Yöntem Yasağı',
+    HttpStatusEnum::CONFLICT->value => 'Çakışma',
     HttpStatusEnum::UNPROCESSABLE_ENTITY->value => 'İşlenemez İçerik',
     HttpStatusEnum::INTERNAL_SERVER_ERROR->value => 'Sunucu Hatası',
     HttpStatusEnum::SERVICE_UNAVAILABLE->value => 'Hizmet Mevcut Değil',

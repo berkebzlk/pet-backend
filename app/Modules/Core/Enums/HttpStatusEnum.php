@@ -12,6 +12,7 @@ enum HttpStatusEnum: int
     case FORBIDDEN = 403;
     case NOT_FOUND = 404;
     case METHOD_NOT_ALLOWED = 405;
+    case CONFLICT = 409;
     case UNPROCESSABLE_ENTITY = 422;
     case INTERNAL_SERVER_ERROR = 500;
     case SERVICE_UNAVAILABLE = 503;
@@ -33,6 +34,7 @@ enum HttpStatusEnum: int
             self::FORBIDDEN => $httpLabels['forbidden'] ?? '',
             self::NOT_FOUND => $httpLabels['not_found'] ?? '',
             self::METHOD_NOT_ALLOWED => $httpLabels['method_not_allowed'] ?? '',
+            self::CONFLICT => $httpLabels['conflict'] ?? '',
             self::UNPROCESSABLE_ENTITY => $httpLabels['unprocessable_entity'] ?? '',
             self::INTERNAL_SERVER_ERROR => $httpLabels['internal_server_error'] ?? '',
             self::SERVICE_UNAVAILABLE => $httpLabels['service_unavailable'] ?? '',
