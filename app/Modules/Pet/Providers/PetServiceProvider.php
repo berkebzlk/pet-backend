@@ -2,10 +2,13 @@
 
 namespace App\Modules\Pet\Providers;
 
+use App\Modules\Pet\Models\Pet;
+use App\Modules\Pet\Policies\PetPolicy;
 use App\Modules\Pet\Repositories\Impl\PetRepository;
 use App\Modules\Pet\Repositories\PetRepositoryInterface;
 use App\Modules\Pet\Services\Impl\PetService;
 use App\Modules\Pet\Services\PetServiceInterface;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class PetServiceProvider extends ServiceProvider
@@ -28,6 +31,6 @@ class PetServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        Gate::policy(Pet::class, PetPolicy::class);
     }
 }
