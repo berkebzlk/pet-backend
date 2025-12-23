@@ -103,7 +103,7 @@ class DataGridHelper
             return new LengthAwarePaginator(
                 $items,
                 $items->count(),
-                $items->count(),
+                max($items->count(), 1), // Prevent division by zero
                 $this->page,
                 ['path' => LengthAwarePaginator::resolveCurrentPath()]
             );

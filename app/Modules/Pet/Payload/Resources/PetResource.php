@@ -21,6 +21,11 @@ class PetResource extends JsonResource
             'isNeutered' => (boolean) $this->is_neutered,
             'bio' => $this->bio,
             'image' => $this->image ? url('storage/' . $this->image) : null,
+            'user' => [
+                'id' => $this->user->id,
+                'name' => $this->user->name,
+                'email' => $this->user->email,
+            ],
             'createdAt' => $this->created_at,
             'updatedAt' => $this->updated_at,
         ];
