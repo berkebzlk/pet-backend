@@ -22,6 +22,17 @@ class PetController extends Controller
     public function index(Request $request)
     {
         $data = $request->all();
+
+        // Ensure filters is an array
+        if (!isset($data['filters']) || !is_array($data['filters'])) {
+            $data['filters'] = [];
+        }
+
+        // Exclude current user's pets from the listing
+        if ($request->user()) {
+            $data['filters']['user_id_not'] = $request->user()->id;
+        }
+
         $pets = $this->petService->index($data);
 
         return ResponseHelper::success(new PaginatedResource($pets, PetResource::class));

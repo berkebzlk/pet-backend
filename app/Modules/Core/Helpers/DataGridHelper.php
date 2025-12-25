@@ -143,6 +143,12 @@ class DataGridHelper
     public function applyFilters(): void
     {
         foreach ($this->filters as $field => $value) {
+            if (str_ends_with($field, '_not')) {
+                $realField = substr($field, 0, -4);
+                $this->query->where($realField, '!=', $value);
+                continue;
+            }
+
             if (is_array($value)) {
                 // Range filter (e.g., ['min' => 10, 'max' => 100])
                 if (isset($value['min'])) {

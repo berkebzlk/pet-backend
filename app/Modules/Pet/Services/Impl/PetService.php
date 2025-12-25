@@ -26,9 +26,7 @@ class PetService extends BaseService implements PetServiceInterface
             throw new Exception(__('http.' . HttpStatusEnum::NOT_FOUND->value, ['attribute' => $this->getModelName()]), HttpStatusEnum::NOT_FOUND->value);
         }
 
-        if ($pet->user_id !== auth()->id()) {
-            throw new Exception(__('http.' . HttpStatusEnum::FORBIDDEN->value), HttpStatusEnum::FORBIDDEN->value);
-        }
+        // Ownership check removed to allow viewing other users' pets
 
         return $pet;
     }
@@ -50,7 +48,11 @@ class PetService extends BaseService implements PetServiceInterface
 
     public function update(int $id, array $data)
     {
-        $pet = $this->show($id); // Re-use show for auth check
+        $pet = $this->show($id);
+
+        if ($pet->user_id !== auth()->id()) {
+            throw new Exception(__('http.' . HttpStatusEnum::FORBIDDEN->value), HttpStatusEnum::FORBIDDEN->value);
+        }
 
         if (isset($data['image']) && $data['image'] instanceof UploadedFile) {
             // Delete old image
@@ -66,7 +68,11 @@ class PetService extends BaseService implements PetServiceInterface
 
     public function delete(int $id)
     {
-        $pet = $this->show($id); // Re-use show for auth check
+        $pet = $this->show($id);
+
+        if ($pet->user_id !== auth()->id()) {
+            throw new Exception(__('http.' . HttpStatusEnum::FORBIDDEN->value), HttpStatusEnum::FORBIDDEN->value);
+        }
 
         if ($pet?->image) {
             Storage::disk('public')->delete($pet->image);
