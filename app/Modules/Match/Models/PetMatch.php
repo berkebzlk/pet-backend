@@ -15,12 +15,16 @@ class PetMatch extends Model
         'status',
     ];
 
-    public function initiator(): BelongsTo
+    protected $casts = [
+        'status' => \App\Modules\Core\Enums\StatusEnum::class,
+    ];
+
+    public function initiatorPet(): BelongsTo
     {
         return $this->belongsTo(Pet::class, 'initiator_pet_id');
     }
 
-    public function target(): BelongsTo
+    public function targetPet(): BelongsTo
     {
         return $this->belongsTo(Pet::class, 'target_pet_id');
     }

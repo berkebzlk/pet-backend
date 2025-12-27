@@ -15,6 +15,14 @@ class PetPolicy
     {
         return $user->id === $pet->user_id;
     }
+
+    /**
+     * Determine whether the user can view matches for the pet.
+     */
+    public function viewMatches(User $user, Pet $pet): bool
+    {
+        return $user->id === $pet->user_id;
+    }
     /**
      * Determine whether the user can view any models.
      */

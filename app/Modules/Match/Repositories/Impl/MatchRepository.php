@@ -23,4 +23,12 @@ class MatchRepository extends BaseRepositoryEloquent implements MatchRepositoryI
                 ->where('target_pet_id', $pet1Id);
         })->first();
     }
+
+    public function getPendingMatchesForPet(int $petId)
+    {
+        return $this->model->where('target_pet_id', $petId)
+            ->where('status', \App\Modules\Core\Enums\StatusEnum::PENDING->value)
+            ->with('initiatorPet')
+            ->get();
+    }
 }

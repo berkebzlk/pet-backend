@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('initiator_pet_id')->constrained('pets')->onDelete('cascade');
             $table->foreignId('target_pet_id')->constrained('pets')->onDelete('cascade');
-            $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
+            $table->tinyInteger('status')->default(4); // StatusEnum::PENDING
             $table->timestamps();
 
             $table->unique(['initiator_pet_id', 'target_pet_id']);
