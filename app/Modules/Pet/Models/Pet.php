@@ -22,6 +22,9 @@ class Pet extends Model
         'is_neutered',
         'bio',
         'image',
+        'username',
+        'posts_count',
+        'match_count',
     ];
 
     protected $casts = [

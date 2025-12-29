@@ -20,6 +20,9 @@ class PetResource extends JsonResource
             'weight' => (float) $this->weight,
             'isNeutered' => (boolean) $this->is_neutered,
             'bio' => $this->bio,
+            'username' => $this->username,
+            'postsCount' => (int) $this->posts_count,
+            'matchCount' => (int) $this->match_count,
             'image' => $this->image ? url('storage/' . $this->image) : null,
             'user' => [
                 'id' => $this->user->id,

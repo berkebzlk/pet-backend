@@ -15,6 +15,7 @@ class UpdatePetRequest extends FormRequest
     {
         return [
             'name' => ['sometimes', 'required', 'string', 'max:255'],
+            'username' => ['sometimes', 'required', 'string', 'max:30', 'unique:pets,username,' . $this->route('pet'), 'regex:/^[a-zA-Z0-9_.]+$/'],
             'type' => ['sometimes', 'required', 'string', 'max:50'],
             'breed' => ['nullable', 'string', 'max:100'],
             'gender' => ['sometimes', 'required', 'in:male,female'],

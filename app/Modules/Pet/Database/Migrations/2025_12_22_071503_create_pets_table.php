@@ -22,6 +22,9 @@ return new class extends Migration {
             $table->boolean('is_neutered')->default(false);
             $table->text('bio')->nullable();
             $table->string('image')->nullable();
+            $table->string('username')->unique()->index();
+            $table->integer('posts_count')->default(0);
+            $table->integer('match_count')->default(0);
             $table->timestamps();
         });
     }

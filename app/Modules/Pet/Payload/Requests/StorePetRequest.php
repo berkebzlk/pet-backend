@@ -15,6 +15,7 @@ class StorePetRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:30', 'unique:pets,username', 'regex:/^[a-zA-Z0-9_.]+$/'],
             'type' => ['required', 'string', 'max:50'],
             'breed' => ['nullable', 'string', 'max:100'],
             'gender' => ['required', 'in:male,female'],
