@@ -28,15 +28,22 @@ class MakeModule extends Command
 
         // Klasör yapısını oluştur
         $directories = [
-            'Requests',
-            'Resources',
             'Controllers',
             'Services/Impl',
             'Repositories/Impl',
             'Models',
+            'Resources/lang/tr',
+            'Resources/lang/en',
             'Routes',
+            'Payload/Requests',
+            'Payload/Resources',
             'Providers',
+            'Policies',
             'Database/Migrations',
+            'Database/Factories',
+            'Database/Seeders',
+            'Tests/Feature',
+            'Tests/Unit',
         ];
 
         foreach ($directories as $directory) {

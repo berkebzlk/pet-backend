@@ -20,4 +20,17 @@ class ResponseHelper
 
         return response()->json($response, $statusCode);
     }
+    public static function error(
+        string $message,
+        int $statusCode = HttpStatusEnum::BAD_REQUEST->value,
+        mixed $data = null
+    ): JsonResponse {
+        $response = [
+            'success' => false,
+            'message' => $message,
+            'data' => $data,
+        ];
+
+        return response()->json($response, $statusCode);
+    }
 }

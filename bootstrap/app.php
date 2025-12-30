@@ -6,25 +6,29 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Modules\Auth\Exceptions\ExpiredAccessTokenException;
 
-function createResponse($error_code, $message, $errors = [])
-{
-    return [
-        'success' => false,
-        'error_code' => $error_code,
-        'message' => $message,
-        'errors' => $errors,
-    ];
+if (!function_exists('createResponse')) {
+    function createResponse($error_code, $message, $errors = [])
+    {
+        return [
+            'success' => false,
+            'error_code' => $error_code,
+            'message' => $message,
+            'errors' => $errors,
+        ];
+    }
 }
 
-function addExceptionDetails($response, $e)
-{
-    $response['exception'] = class_basename($e);
-    $response['file'] = $e->getFile();
-    $response['line'] = $e->getLine();
-    $response['trace'] = $e->getTrace();
-    $response['message'] = $e->getMessage();
+if (!function_exists('addExceptionDetails')) {
+    function addExceptionDetails($response, $e)
+    {
+        $response['exception'] = class_basename($e);
+        $response['file'] = $e->getFile();
+        $response['line'] = $e->getLine();
+        $response['trace'] = $e->getTrace();
+        $response['message'] = $e->getMessage();
 
-    return $response;
+        return $response;
+    }
 }
 
 return Application::configure(basePath: dirname(__DIR__))
