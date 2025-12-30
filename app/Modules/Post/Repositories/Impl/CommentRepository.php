@@ -13,8 +13,8 @@ class CommentRepository extends BaseRepositoryEloquent implements CommentReposit
         parent::__construct($model);
     }
 
-    public function getByPostId(int $postId)
+    public function getByPostIdQuery(int $postId)
     {
-        return $this->model->where('post_id', $postId)->with('user')->get();
+        return $this->model->where('post_id', $postId)->with('pet');
     }
 }

@@ -11,7 +11,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/post', [PostController::class, 'index']);
     Route::get('/post/{id}', [PostController::class, 'show']);
     Route::delete('/post/{id}', [PostController::class, 'delete']);
-    Route::get('/pet/{petId}/posts', [PostController::class, 'getPetPosts']);
+    Route::get('/pet/{petId}/post', [PostController::class, 'getPetPosts']);
 });
 
 Route::middleware('auth:api')->group(function () {
@@ -20,8 +20,9 @@ Route::middleware('auth:api')->group(function () {
 });
 
 Route::middleware('auth:api')->group(function () {
-    Route::post('/post/{id}/comments', [CommentController::class, 'store']);
-    Route::delete('/post/{id}/comments/{commentId}', [CommentController::class, 'destroy']);
+    Route::post('/post/{id}/comment', [CommentController::class, 'store']);
+    Route::get('/post/{id}/comment', [CommentController::class, 'getCommentsByPostId']);
+    Route::delete('/post/{id}/comment/{commentId}', [CommentController::class, 'destroy']);
 });
 
 Route::middleware('auth:api')->group(function () {

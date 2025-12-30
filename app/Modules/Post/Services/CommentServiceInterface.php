@@ -8,4 +8,5 @@ interface CommentServiceInterface extends BaseServiceInterface
 {
     public function addComment(int $postId, int $petId, string $content);
     public function deleteFromPost(int $postId, int $commentId, int $userId);
+    public function getCommentsByPostId(int $postId, array $requestData);
 }

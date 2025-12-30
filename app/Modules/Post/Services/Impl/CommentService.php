@@ -46,4 +46,16 @@ class CommentService extends BaseService implements CommentServiceInterface
 
         return $this->commentRepository->delete($commentId);
     }
+
+    public function getCommentsByPostId(int $postId, array $requestData)
+    {
+        $query = $this->commentRepository->getByPostIdQuery($postId);
+
+        // Default sort for comments
+        if (!isset($requestData['sortBy'])) {
+            $requestData['sortBy'] = json_encode(['created_at' => 'desc']);
+        }
+
+        return $this->index($requestData, $query);
+    }
 }

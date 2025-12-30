@@ -4,6 +4,7 @@ namespace App\Modules\Post\Controllers;
 
 use App\Modules\Core\Enums\HttpStatusEnum;
 use App\Modules\Core\Helpers\ResponseHelper;
+use App\Modules\Core\Payload\Resources\PaginatedResource;
 use App\Modules\Post\Payload\Requests\StoreCommentRequest;
 use App\Modules\Post\Services\CommentServiceInterface;
 use Illuminate\Http\Request;
@@ -33,5 +34,11 @@ class CommentController extends Controller
     {
         $this->commentService->deleteFromPost($postId, $commentId, Auth::user()->id);
         return ResponseHelper::success(null, HttpStatusEnum::OK->value, 'Comment deleted');
+    }
+
+    public function getCommentsByPostId($postId)
+    {
+        $comments = $this->commentService->getCommentsByPostId($postId, request()->all());
+        return ResponseHelper::success(new PaginatedResource($comments));
     }
 }
