@@ -33,17 +33,41 @@ class PetService extends BaseService implements PetServiceInterface
 
     public function store(array $data)
     {
-        if (isset($data['image']) && $data['image'] instanceof UploadedFile) {
-            $path = $data['image']->store('pets', 'public');
-            $data['image'] = $path;
-        }
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($data) {
+            // Ensure user_id is set if not present
+            if (!isset($data['user_id'])) {
+                $data['user_id'] = auth()->id();
+            }
 
-        // Ensure user_id is set if not present
-        if (!isset($data['user_id'])) {
-            $data['user_id'] = auth()->id();
-        }
+            // Create pet first to get ID
+            // We need to handle image separately after creation if we want ID in path
+            // Or we can use a temporary path and move it, but creating first is safer for ID consistency
 
-        return $this->petRepository->create($data);
+            $image = null;
+            if (isset($data['image']) && $data['image'] instanceof UploadedFile) {
+                $image = $data['image'];
+                unset($data['image']);
+            }
+
+            $pet = $this->petRepository->create($data);
+
+            if ($image) {
+                try {
+                    $path = $image->store("users/{$pet->user_id}/pets/{$pet->id}/profilePhoto", 'public');
+
+                    if (!$path) {
+                        throw new Exception("Failed to store image file.");
+                    }
+
+                    $this->petRepository->update($pet->id, ['image' => $path]);
+                    $pet->refresh();
+                } catch (Exception $e) {
+                    throw new Exception("Image upload failed: " . $e->getMessage());
+                }
+            }
+
+            return $pet;
+        });
     }
 
     public function update(int $id, array $data)
@@ -59,7 +83,7 @@ class PetService extends BaseService implements PetServiceInterface
             if ($pet->image) {
                 Storage::disk('public')->delete($pet->image);
             }
-            $path = $data['image']->store('pets', 'public');
+            $path = $data['image']->store("users/{$pet->user_id}/pets/{$pet->id}/profilePhoto", 'public');
             $data['image'] = $path;
         }
 

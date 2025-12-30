@@ -65,8 +65,8 @@ class PetSeeder extends Seeder
             ]);
 
             if ($sourcePath) {
-                // Create directory structure: pets/{user_id}/{pet_id}/
-                $targetDir = "pets/{$user->id}/{$pet->id}";
+                // Create directory structure: users/{user_id}/pets/{pet_id}/profilePhoto/
+                $targetDir = "users/{$user->id}/pets/{$pet->id}/profilePhoto";
 
                 // Create directory in public disk
                 Storage::disk('public')->makeDirectory($targetDir);

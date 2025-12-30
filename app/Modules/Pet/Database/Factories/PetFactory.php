@@ -21,7 +21,7 @@ class PetFactory extends Factory
             'weight' => $this->faker->randomFloat(2, 1, 50),
             'birthdate' => $this->faker->date(),
             'is_neutered' => $this->faker->boolean,
-            'image' => null,
+            'image' => null, // We can't easily generate structured files in factory without complex setup
             'username' => $this->faker->unique()->userName,
             'bio' => $this->faker->sentence,
             'posts_count' => $this->faker->numberBetween(0, 100),

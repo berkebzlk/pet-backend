@@ -4,6 +4,7 @@ namespace App\Modules\Pet\Payload\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class PetResource extends JsonResource
 {
@@ -23,7 +24,7 @@ class PetResource extends JsonResource
             'username' => $this->username,
             'postsCount' => (int) $this->posts_count,
             'matchCount' => (int) $this->match_count,
-            'image' => $this->image ? url('storage/' . $this->image) : null,
+            'image' => $this->image ? asset(Storage::url($this->image)) : null,
             'user' => [
                 'id' => $this->user->id,
                 'name' => $this->user->name,
