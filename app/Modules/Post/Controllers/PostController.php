@@ -1,0 +1,70 @@
+<?php
+
+namespace App\Modules\Post\Controllers;
+
+use App\Modules\Core\Enums\HttpStatusEnum;
+use App\Modules\Core\Helpers\ResponseHelper;
+use App\Modules\Post\Payload\Requests\StorePostRequest;
+use App\Modules\Post\Payload\Resources\PostResource;
+use App\Modules\Post\Services\PostServiceInterface;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
+
+class PostController extends Controller
+{
+    public function __construct(
+        private PostServiceInterface $postService
+    ) {
+    }
+
+    public function store(StorePostRequest $request)
+    {
+        // Verify pet ownership
+        $pet = Auth::user()->pets()->findOrFail($request->pet_id);
+
+        $post = $this->postService->createPost(
+            $pet->id,
+            $request->file('image'),
+            $request->description
+        );
+
+        return ResponseHelper::success(new PostResource($post), HttpStatusEnum::CREATED->value, 'Post created successfully');
+    }
+
+    public function index()
+    {
+        $posts = $this->postService->getFeed();
+        $posts->loadCount(['likes', 'comments']);
+        return ResponseHelper::success(PostResource::collection($posts));
+    }
+
+    public function show($id)
+    {
+        $post = $this->postService->show($id);
+
+        $post->load(['pet', 'likes', 'comments']);
+        $post->loadCount(['likes', 'comments']);
+        return ResponseHelper::success(new PostResource($post));
+    }
+
+    public function getPetPosts($petId)
+    {
+        $posts = $this->postService->getPetPosts($petId);
+        $posts->loadCount(['likes', 'comments']);
+        return ResponseHelper::success(PostResource::collection($posts));
+    }
+
+    public function delete($id)
+    {
+        $post = $this->postService->show($id);
+        $post->load('pet');
+
+        if ($post->pet->user_id !== Auth::id()) {
+            return ResponseHelper::error('Unauthorized', HttpStatusEnum::FORBIDDEN->value);
+        }
+
+        $post->delete();
+
+        return ResponseHelper::success(null, HttpStatusEnum::OK->value, 'Post deleted successfully');
+    }
+}
