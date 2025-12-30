@@ -2,11 +2,13 @@
 
 namespace App\Modules\Core\Services;
 
+use Illuminate\Database\Eloquent\Builder;
+
 interface BaseServiceInterface
 {
     public function getModelName(): string;
 
-    public function index(array $requestData = []);
+    public function index(array $requestData = [], ?Builder $query = null);
 
     /**
      * Get single record by ID

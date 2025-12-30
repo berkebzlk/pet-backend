@@ -7,6 +7,7 @@ use App\Modules\Core\Services\BaseServiceInterface;
 use App\Modules\Core\Repositories\BaseRepositoryInterface;
 use App\Modules\Core\Helpers\DataGridHelper;
 use App\Modules\Role\Models\Role;
+use Illuminate\Database\Eloquent\Builder;
 use Exception;
 
 abstract class BaseService implements BaseServiceInterface
@@ -15,7 +16,8 @@ abstract class BaseService implements BaseServiceInterface
 
     public function __construct(
         private readonly BaseRepositoryInterface $repository
-    ) {}
+    ) {
+    }
 
     public function getModelName(): string
     {
@@ -47,10 +49,10 @@ abstract class BaseService implements BaseServiceInterface
         return 'Record';
     }
 
-    public function index(array $requestData = [])
+    public function index(array $requestData = [], ?Builder $query = null)
     {
-        $query = $this->repository->getQuery();
-        
+        $query = $query ?? $this->repository->getQuery();
+
         // get parameters from request data and validation
         $perPage = $requestData['perPage'] ?? null;
         $page = $requestData['page'] ?? 1;
@@ -59,9 +61,9 @@ abstract class BaseService implements BaseServiceInterface
         $filters = $requestData['filters'] ?? [];
         $selectFields = $requestData['fields'] ?? [];
 
-        $page = is_numeric($page) && $page > 0 ? (int)$page : 1;
+        $page = is_numeric($page) && $page > 0 ? (int) $page : 1;
         $searchTerm = is_string($searchTerm) ? trim($searchTerm) : '';
-        
+
         // decode JSON strings
         if (is_string($sortBy)) {
             $sortBy = json_decode($sortBy, true) ?? [];
@@ -72,7 +74,7 @@ abstract class BaseService implements BaseServiceInterface
         if (is_string($selectFields)) {
             $selectFields = json_decode($selectFields, true) ?? [];
         }
-        
+
         // Array validation
         $sortBy = is_array($sortBy) ? $sortBy : [];
         $filters = is_array($filters) ? $filters : [];
@@ -81,12 +83,12 @@ abstract class BaseService implements BaseServiceInterface
         // apply DataGrid features
         $dataGrid = new DataGridHelper($query);
         $dataGrid->setSearchableFields(DataGridHelper::getSearchableFields($this->repository->getModel()))
-                 ->setSortableFields(DataGridHelper::getSortableFields($this->repository->getModel()))
-                 ->setSelectFields($selectFields)
-                 ->setSearchTerm($searchTerm)
-                 ->setSorting($sortBy)
-                 ->setFilters($filters)
-                 ->setPagination($perPage, $page);
+            ->setSortableFields(DataGridHelper::getSortableFields($this->repository->getModel()))
+            ->setSelectFields($selectFields)
+            ->setSearchTerm($searchTerm)
+            ->setSorting($sortBy)
+            ->setFilters($filters)
+            ->setPagination($perPage, $page);
 
         // always return pagination
         return $dataGrid->getResults();
