@@ -27,13 +27,13 @@ class CommentController extends Controller
         ];
 
         $comment = $this->commentService->store($data);
-        return ResponseHelper::success($comment, HttpStatusEnum::CREATED->value, 'Comment added');
+        return ResponseHelper::success($comment, HttpStatusEnum::CREATED->value, trans('post::post.comment_added'));
     }
 
     public function destroy($postId, $commentId)
     {
         $this->commentService->deleteFromPost($postId, $commentId, Auth::user()->id);
-        return ResponseHelper::success(null, HttpStatusEnum::OK->value, 'Comment deleted');
+        return ResponseHelper::success(null, HttpStatusEnum::OK->value, trans('post::post.comment_deleted'));
     }
 
     public function getCommentsByPostId($postId)
