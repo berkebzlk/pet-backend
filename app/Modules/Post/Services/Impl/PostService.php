@@ -53,13 +53,13 @@ class PostService extends BaseService implements PostServiceInterface
         });
     }
 
-    public function getFeed()
+    public function getFeed(?int $viewingPetId = null)
     {
-        return $this->postRepository->getFeed();
+        return $this->postRepository->getFeed($viewingPetId);
     }
 
-    public function getPetPosts(int $petId)
+    public function getPetPosts(int $petId, ?int $viewingPetId = null)
     {
-        return $this->postRepository->getByPetId($petId);
+        return $this->postRepository->getByPetId($petId, $viewingPetId);
     }
 }

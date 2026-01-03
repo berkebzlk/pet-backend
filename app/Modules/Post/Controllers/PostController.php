@@ -28,12 +28,13 @@ class PostController extends Controller
             $request->description
         );
 
-        return ResponseHelper::success(new PostResource($post), HttpStatusEnum::CREATED->value, 'Post created successfully');
+        return ResponseHelper::success(new PostResource($post), HttpStatusEnum::CREATED->value, trans('post::post.created'));
     }
 
     public function index()
     {
-        $posts = $this->postService->getFeed();
+        $viewingPetId = request()->query('pet_id');
+        $posts = $this->postService->getFeed($viewingPetId);
         $posts->loadCount(['likes', 'comments']);
         return ResponseHelper::success(PostResource::collection($posts));
     }
@@ -49,7 +50,8 @@ class PostController extends Controller
 
     public function getPetPosts($petId)
     {
-        $posts = $this->postService->getPetPosts($petId);
+        $viewingPetId = request()->query('pet_id');
+        $posts = $this->postService->getPetPosts($petId, $viewingPetId);
         $posts->loadCount(['likes', 'comments']);
         return ResponseHelper::success(PostResource::collection($posts));
     }
@@ -65,6 +67,6 @@ class PostController extends Controller
 
         $post->delete();
 
-        return ResponseHelper::success(null, HttpStatusEnum::OK->value, 'Post deleted successfully');
+        return ResponseHelper::success(null, HttpStatusEnum::OK->value, trans('post::post.deleted'));
     }
 }

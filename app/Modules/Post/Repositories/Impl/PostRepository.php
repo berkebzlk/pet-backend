@@ -13,13 +13,39 @@ class PostRepository extends BaseRepositoryEloquent implements PostRepositoryInt
         parent::__construct($model);
     }
 
-    public function getFeed()
+    public function getFeed(?int $viewingPetId = null)
     {
-        return $this->model->with('pet')->latest()->get();
+        $query = $this->model->with('pet')->latest();
+
+        if ($viewingPetId) {
+            $query->withExists([
+                'likes as is_liked' => function ($q) use ($viewingPetId) {
+                    $q->where('pet_id', $viewingPetId);
+                },
+                'savedBy as is_saved' => function ($q) use ($viewingPetId) {
+                    $q->where('pet_id', $viewingPetId);
+                }
+            ]);
+        }
+
+        return $query->get();
     }
 
-    public function getByPetId(int $petId)
+    public function getByPetId(int $petId, ?int $viewingPetId = null)
     {
-        return $this->model->where('pet_id', $petId)->with('pet')->latest()->get();
+        $query = $this->model->where('pet_id', $petId)->with('pet')->latest();
+
+        if ($viewingPetId) {
+            $query->withExists([
+                'likes as is_liked' => function ($q) use ($viewingPetId) {
+                    $q->where('pet_id', $viewingPetId);
+                },
+                'savedBy as is_saved' => function ($q) use ($viewingPetId) {
+                    $q->where('pet_id', $viewingPetId);
+                }
+            ]);
+        }
+
+        return $query->get();
     }
 }

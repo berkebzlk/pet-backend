@@ -8,6 +8,6 @@ use Illuminate\Http\UploadedFile;
 interface PostServiceInterface extends BaseServiceInterface
 {
     public function createPost(int $petId, UploadedFile $image, ?string $description);
-    public function getFeed();
-    public function getPetPosts(int $petId);
+    public function getFeed(?int $viewingPetId = null);
+    public function getPetPosts(int $petId, ?int $viewingPetId = null);
 }
