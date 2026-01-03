@@ -13,18 +13,18 @@ class SavedPostRepository extends BaseRepositoryEloquent implements SavedPostRep
         parent::__construct($model);
     }
 
-    public function save(int $postId, int $userId)
+    public function save(int $postId, int $petId)
     {
         $this->model->firstOrCreate([
             'post_id' => $postId,
-            'user_id' => $userId
+            'pet_id' => $petId
         ]);
     }
 
-    public function unsave(int $postId, int $userId)
+    public function unsave(int $postId, int $petId)
     {
         $this->model->where('post_id', $postId)
-            ->where('user_id', $userId)
+            ->where('pet_id', $petId)
             ->delete();
     }
 }

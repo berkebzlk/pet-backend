@@ -14,13 +14,15 @@ class SavedPostService extends BaseService implements SavedPostServiceInterface
         parent::__construct($savedPostRepository);
     }
 
-    public function save(int $postId, int $userId)
+    public function save(int $postId, int $petId)
     {
-        return $this->savedPostRepository->save($postId, $userId);
+        auth()->user()->pets()->findOrFail($petId);
+        return $this->savedPostRepository->save($postId, $petId);
     }
 
-    public function unsave(int $postId, int $userId)
+    public function unsave(int $postId, int $petId)
     {
-        return $this->savedPostRepository->unsave($postId, $userId);
+        auth()->user()->pets()->findOrFail($petId);
+        return $this->savedPostRepository->unsave($postId, $petId);
     }
 }

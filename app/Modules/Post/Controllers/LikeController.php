@@ -17,13 +17,19 @@ class LikeController extends Controller
 
     public function like($postId)
     {
-        $this->likeService->like($postId, Auth::id());
+        $request = request();
+        $request->validate(['pet_id' => 'required|integer|exists:pets,id']);
+
+        $this->likeService->like($postId, $request->pet_id);
         return ResponseHelper::success(null, HttpStatusEnum::OK->value, 'Post liked');
     }
 
     public function unlike($postId)
     {
-        $this->likeService->unlike($postId, Auth::id());
+        $request = request();
+        $request->validate(['pet_id' => 'required|integer|exists:pets,id']);
+
+        $this->likeService->unlike($postId, $request->pet_id);
         return ResponseHelper::success(null, HttpStatusEnum::OK->value, 'Post unliked');
     }
 }

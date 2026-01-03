@@ -17,13 +17,19 @@ class SavedPostController extends Controller
 
     public function save($postId)
     {
-        $this->savedPostService->save($postId, Auth::id());
-        return ResponseHelper::success(null, HttpStatusEnum::OK->value, 'Post saved');
+        $request = request();
+        $request->validate(['pet_id' => 'required|integer|exists:pets,id']);
+
+        $this->savedPostService->save($postId, $request->pet_id);
+        return ResponseHelper::success(null, HttpStatusEnum::OK->value, trans('post::post.saved'));
     }
 
     public function unsave($postId)
     {
-        $this->savedPostService->unsave($postId, Auth::id());
-        return ResponseHelper::success(null, HttpStatusEnum::OK->value, 'Post unsaved');
+        $request = request();
+        $request->validate(['pet_id' => 'required|integer|exists:pets,id']);
+
+        $this->savedPostService->unsave($postId, $request->pet_id);
+        return ResponseHelper::success(null, HttpStatusEnum::OK->value, trans('post::post.unsaved'));
     }
 }

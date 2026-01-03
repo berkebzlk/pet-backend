@@ -14,13 +14,15 @@ class LikeService extends BaseService implements LikeServiceInterface
         parent::__construct($likeRepository);
     }
 
-    public function like(int $postId, int $userId)
+    public function like(int $postId, int $petId)
     {
-        return $this->likeRepository->like($postId, $userId);
+        auth()->user()->pets()->findOrFail($petId);
+        return $this->likeRepository->like($postId, $petId);
     }
 
-    public function unlike(int $postId, int $userId)
+    public function unlike(int $postId, int $petId)
     {
-        return $this->likeRepository->unlike($postId, $userId);
+        auth()->user()->pets()->findOrFail($petId);
+        return $this->likeRepository->unlike($postId, $petId);
     }
 }
