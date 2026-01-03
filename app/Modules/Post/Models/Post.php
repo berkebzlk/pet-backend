@@ -36,17 +36,5 @@ class Post extends Model
         return $this->hasMany(SavedPost::class);
     }
 
-    public function isLikedBy($user)
-    {
-        if (!$user)
-            return false;
-        return $this->likes()->where('user_id', $user->id)->exists();
-    }
 
-    public function isSavedBy($user)
-    {
-        if (!$user)
-            return false;
-        return $this->savedBy()->where('user_id', $user->id)->exists();
-    }
 }

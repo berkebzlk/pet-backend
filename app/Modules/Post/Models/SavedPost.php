@@ -2,7 +2,7 @@
 
 namespace App\Modules\Post\Models;
 
-use App\Models\User;
+use App\Modules\Pet\Models\Pet;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,11 +10,11 @@ class SavedPost extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'post_id'];
+    protected $fillable = ['pet_id', 'post_id'];
 
-    public function user()
+    public function pet()
     {
-        return $this->belongsTo(\App\Modules\User\Models\User::class);
+        return $this->belongsTo(Pet::class);
     }
 
     public function post()

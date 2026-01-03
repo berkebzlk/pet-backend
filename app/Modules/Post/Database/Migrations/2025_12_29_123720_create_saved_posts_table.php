@@ -9,10 +9,10 @@ return new class extends Migration {
     {
         Schema::create('saved_posts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('pet_id')->constrained()->onDelete('cascade');
             $table->foreignId('post_id')->constrained()->onDelete('cascade');
             $table->timestamps();
-            $table->unique(['user_id', 'post_id']);
+            $table->unique(['pet_id', 'post_id']);
         });
     }
 
