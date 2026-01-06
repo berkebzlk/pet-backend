@@ -23,7 +23,8 @@ class PetResource extends JsonResource
             'bio' => $this->bio,
             'username' => $this->username,
             'postsCount' => (int) $this->posts_count,
-            'matchCount' => (int) $this->match_count,
+            'matchCount' => (int) ($this->initiated_matches_count + $this->received_matches_count),
+            'likesCount' => (int) $this->received_likes_count,
             'image' => $this->image ? asset(Storage::url($this->image)) : null,
             'user' => [
                 'id' => $this->user->id,

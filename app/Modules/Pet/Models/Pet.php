@@ -50,4 +50,31 @@ class Pet extends Model
     {
         return $this->hasMany(SavedPost::class);
     }
+
+    public function posts(): HasMany
+    {
+        return $this->hasMany(\App\Modules\Post\Models\Post::class);
+    }
+
+    public function initiatedMatches(): HasMany
+    {
+        return $this->hasMany(\App\Modules\Match\Models\PetMatch::class, 'initiator_pet_id');
+    }
+
+    public function receivedMatches(): HasMany
+    {
+        return $this->hasMany(\App\Modules\Match\Models\PetMatch::class, 'target_pet_id');
+    }
+
+    public function receivedLikes(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
+    {
+        return $this->hasManyThrough(
+            \App\Modules\Post\Models\Like::class,
+            \App\Modules\Post\Models\Post::class,
+            'pet_id', // Foreign key on posts table...
+            'post_id', // Foreign key on likes table...
+            'id', // Local key on pets table...
+            'id' // Local key on posts table...
+        );
+    }
 }
