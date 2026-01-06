@@ -9,6 +9,8 @@ Route::group(['middleware' => ['auth:api'], 'prefix' => 'matches'], function () 
     Route::get('/check', [MatchController::class, 'check']);
     Route::post('/{id}/accept', [MatchController::class, 'accept']);
     Route::post('/{id}/reject', [MatchController::class, 'reject']);
+    Route::delete('/{id}', [MatchController::class, 'cancel']);
+    Route::get('/{petId}', [MatchController::class, 'index']);
 });
 
 

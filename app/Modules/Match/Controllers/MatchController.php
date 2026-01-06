@@ -57,4 +57,32 @@ class MatchController extends Controller
 
         return ResponseHelper::success($match ? new MatchResource($match) : null);
     }
+
+    public function cancel(int $id)
+    {
+        $this->matchService->cancelMatchRequest($id);
+        return ResponseHelper::success(null, HttpStatusEnum::OK->value, 'Match request cancelled.');
+    }
+
+    public function index(Request $request, int $petId)
+    {
+        $request->validate([
+            'search' => 'nullable|string',
+            'per_page' => 'nullable|integer|min:1|max:50',
+        ]);
+
+        $data = $request->all();
+        if ($request->has('per_page')) {
+            $data['perPage'] = $request->input('per_page');
+        }
+
+        $matches = $this->matchService->getMatches($petId, $data);
+
+        // Transform matches to pets (the other party)
+        $matches->setCollection($matches->getCollection()->map(function ($match) use ($petId) {
+            return $match->initiator_pet_id == $petId ? $match->targetPet : $match->initiatorPet;
+        }));
+
+        return ResponseHelper::success(new \App\Modules\Core\Payload\Resources\PaginatedResource($matches, \App\Modules\Pet\Payload\Resources\PetResource::class));
+    }
 }
