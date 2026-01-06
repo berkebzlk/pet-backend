@@ -18,4 +18,12 @@ class UserRepositoryEloquent extends BaseRepositoryEloquent implements UserRepos
         $this->model->where('id', $userId)->tokens()->delete();
         return true;
     }
+
+    public function getSearchUsersQuery(string $searchText)
+    {
+        return $this->model->where(function ($q) use ($searchText) {
+            $q->where('username', 'like', "%{$searchText}%")
+                ->orWhere('name', 'like', "%{$searchText}%");
+        });
+    }
 }

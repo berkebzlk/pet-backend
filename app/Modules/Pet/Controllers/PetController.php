@@ -72,4 +72,25 @@ class PetController extends Controller
 
         return ResponseHelper::success(null, HttpStatusEnum::OK->value, __('crud.deleted', ['attribute' => $this->petService->getModelName()]));
     }
+
+    public function getByUsername($username)
+    {
+        $pet = $this->petService->getByUsername($username);
+        return ResponseHelper::success(new PetResource($pet), HttpStatusEnum::OK->value);
+    }
+
+    public function search(Request $request)
+    {
+        $request->validate([
+            'q' => 'required|string|min:1',
+            'limit' => 'nullable|integer|min:1|max:50',
+        ]);
+
+        $query = $request->input('q');
+        $limit = $request->input('limit', 10);
+
+        $pets = $this->petService->search($query, $limit);
+
+        return ResponseHelper::success(PetResource::collection($pets));
+    }
 }

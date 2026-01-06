@@ -104,4 +104,14 @@ class PetService extends BaseService implements PetServiceInterface
 
         return $this->petRepository->delete($id);
     }
+
+    public function getByUsername(string $username)
+    {
+        return $this->petRepository->getByUsername($username);
+    }
+
+    public function search(string $query, int $limit = 10)
+    {
+        return $this->petRepository->search($query, $limit);
+    }
 }

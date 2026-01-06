@@ -16,7 +16,8 @@ class UserController extends Controller
 {
     public function __construct(
         private UserServiceInterface $userService
-    ) {}
+    ) {
+    }
 
     public function index(): JsonResponse
     {
@@ -58,5 +59,12 @@ class UserController extends Controller
         $user = $this->userService->show($request->user()->id);
 
         return ResponseHelper::success(new UserResource($user));
+    }
+
+    public function search(Request $request): JsonResponse
+    {
+        $searchText = $request->query('q');
+        $users = $this->userService->searchUsers($searchText, $request->all());
+        return ResponseHelper::success(UserResource::collection($users));
     }
 }

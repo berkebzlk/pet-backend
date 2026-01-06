@@ -5,4 +5,6 @@ namespace App\Modules\User\Services;
 use App\Modules\Core\Services\BaseServiceInterface;
 
 interface UserServiceInterface extends BaseServiceInterface
-{ }
+{
+    public function searchUsers(string $searchText, array $requestData);
+}

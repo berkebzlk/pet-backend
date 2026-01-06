@@ -69,4 +69,30 @@ class PostController extends Controller
 
         return ResponseHelper::success(null, HttpStatusEnum::OK->value, trans('post::post.deleted'));
     }
+
+    public function random()
+    {
+        $viewingPetId = request()->query('pet_id');
+        $limit = request()->query('limit', 20);
+        $posts = $this->postService->getRandomPosts($limit, $viewingPetId);
+        // No need to load counts for minimal resource
+        return ResponseHelper::success(\App\Modules\Post\Payload\Resources\PostMinimalResource::collection($posts));
+    }
+
+    public function batch(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:posts,id',
+        ]);
+
+        $viewingPetId = $request->query('pet_id'); // Or from body if preferred, but query is standard for context
+        // Actually for POST, body is better for ids, query for context
+        $viewingPetId = $request->input('pet_id');
+
+        $posts = $this->postService->getBatch($request->input('ids'), $viewingPetId);
+        $posts->loadCount(['likes', 'comments']);
+
+        return ResponseHelper::success(PostResource::collection($posts));
+    }
 }

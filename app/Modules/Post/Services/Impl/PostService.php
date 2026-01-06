@@ -62,4 +62,14 @@ class PostService extends BaseService implements PostServiceInterface
     {
         return $this->postRepository->getByPetId($petId, $viewingPetId);
     }
+
+    public function getRandomPosts(int $limit = 20, ?int $viewingPetId = null)
+    {
+        return $this->postRepository->getRandom($limit, $viewingPetId);
+    }
+
+    public function getBatch(array $ids, ?int $viewingPetId = null)
+    {
+        return $this->postRepository->getByIds($ids, $viewingPetId);
+    }
 }
