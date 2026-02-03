@@ -23,6 +23,7 @@ class SendMatchRequestNotification
                     'match_id' => $match->id,
                     'sender_pet_id' => $match->initiatorPet->id,
                     'sender_pet_name' => $match->initiatorPet->name,
+                    'sender_pet_username' => $match->initiatorPet->username,
                     'sender_pet_image' => $match->initiatorPet->image,
                     'message' => "{$match->initiatorPet->name} wants to match with {$match->targetPet->name}!",
                 ],

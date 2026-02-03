@@ -23,6 +23,7 @@ class SendMatchAcceptedNotification
                     'match_id' => $match->id,
                     'accepter_pet_id' => $match->targetPet->id,
                     'accepter_pet_name' => $match->targetPet->name,
+                    'accepter_pet_username' => $match->targetPet->username,
                     'accepter_pet_image' => $match->targetPet->image,
                     'message' => "{$match->targetPet->name} accepted your match request!",
                 ],
