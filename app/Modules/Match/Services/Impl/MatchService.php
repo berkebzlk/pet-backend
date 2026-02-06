@@ -173,4 +173,9 @@ class MatchService extends BaseService implements MatchServiceInterface
         // Use BaseService index method which handles pagination, sorting, etc.
         return $this->index($data, $query);
     }
+    public function arePetsConnected(int $pet1Id, int $pet2Id): bool
+    {
+        $match = $this->matchRepository->findExistingMatch($pet1Id, $pet2Id);
+        return $match && $match->status === StatusEnum::ACCEPTED;
+    }
 }
