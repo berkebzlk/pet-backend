@@ -7,7 +7,7 @@ use App\Modules\Core\Helpers\ResponseHelper;
 use App\Modules\User\Payload\Requests\StoreUserRequest;
 use App\Modules\User\Payload\Requests\UpdateUserRequest;
 use App\Modules\User\Payload\Resources\UserResource;
-use App\Modules\User\Services\UserServiceInterface;
+use App\Modules\User\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -15,7 +15,7 @@ use Illuminate\Routing\Controller;
 class UserController extends Controller
 {
     public function __construct(
-        private UserServiceInterface $userService
+        private UserService $userService
     ) {
     }
 
