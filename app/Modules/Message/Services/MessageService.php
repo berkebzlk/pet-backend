@@ -1,38 +1,33 @@
 <?php
 
-namespace App\Modules\Message\Services\Impl;
+namespace App\Modules\Message\Services;
 
 use App\Modules\Core\Enums\HttpStatusEnum;
-use App\Modules\Core\Services\Impl\BaseService;
-use App\Modules\Match\Services\MatchServiceInterface;
+use App\Modules\Core\Services\BaseEloquentService;
+use App\Modules\Match\Services\MatchService;
+use App\Modules\Message\Events\MessageSent;
 use App\Modules\Message\Models\Message;
-use App\Modules\Message\Services\MessageServiceInterface;
-use App\Modules\Pet\Repositories\PetRepositoryInterface;
-use App\Modules\Pet\Services\Impl\PetService;
+use App\Modules\Pet\Models\Pet;
 use Exception;
 use Illuminate\Support\Facades\Gate;
-use App\Modules\Message\Repositories\MessageRepository;
-use App\Modules\Message\Events\MessageSent;
 
-class MessageService extends BaseService implements MessageServiceInterface
+class MessageService extends BaseEloquentService
 {
     public function __construct(
-        private MatchServiceInterface $matchService,
-        private PetRepositoryInterface $petRepository,
-        private PetService $petService,
-        private MessageRepository $messageRepository
+        protected Message $message,
+        protected MatchService $matchService
     ) {
-        parent::__construct($messageRepository);
+        parent::__construct($message);
     }
 
     public function sendMessage(int $senderPetId, array $data)
     {
-        $senderPet = $this->petRepository->findById($senderPetId);
+        $senderPet = Pet::find($senderPetId);
         $receiverPetId = $data['receiver_pet_id'];
-        $receiverPet = $this->petRepository->findById($receiverPetId);
+        $receiverPet = Pet::find($receiverPetId);
 
         if (!$senderPet || !$receiverPet) {
-            throw new Exception(__('http.' . HttpStatusEnum::NOT_FOUND->value, ['attribute' => $this->petService->getModelName()]), HttpStatusEnum::NOT_FOUND->value);
+            throw new Exception(__('http.' . HttpStatusEnum::NOT_FOUND->value, ['attribute' => 'Pet']), HttpStatusEnum::NOT_FOUND->value);
         }
 
         // Check if sender is owned by auth user (Policy check should handle this, but double check here or trust controller/policy)
@@ -41,12 +36,11 @@ class MessageService extends BaseService implements MessageServiceInterface
         }
 
         // Create message
-        // Create message
         if (!$this->matchService->arePetsConnected($senderPetId, $receiverPetId)) {
             throw new Exception(__('http.' . HttpStatusEnum::FORBIDDEN->value), HttpStatusEnum::FORBIDDEN->value);
         }
 
-        $message = $this->messageRepository->create([
+        $message = $this->message->create([
             'sender_pet_id' => $senderPetId,
             'receiver_pet_id' => $receiverPetId,
             'content' => $data['content'],
@@ -59,11 +53,11 @@ class MessageService extends BaseService implements MessageServiceInterface
 
     public function getMessages(int $petId, int $otherPetId)
     {
-        $pet = $this->petRepository->findById($petId);
-        $otherPet = $this->petRepository->findById($otherPetId);
+        $pet = Pet::find($petId);
+        $otherPet = Pet::find($otherPetId);
 
         if (!$pet || !$otherPet) {
-            throw new Exception(__('http.' . HttpStatusEnum::NOT_FOUND->value, ['attribute' => $this->petService->getModelName()]), HttpStatusEnum::NOT_FOUND->value);
+            throw new Exception(__('http.' . HttpStatusEnum::NOT_FOUND->value, ['attribute' => 'Pet']), HttpStatusEnum::NOT_FOUND->value);
         }
 
         // Check permissions (User must own petId)
@@ -76,7 +70,7 @@ class MessageService extends BaseService implements MessageServiceInterface
             throw new Exception(__('http.' . HttpStatusEnum::FORBIDDEN->value), HttpStatusEnum::FORBIDDEN->value);
         }
 
-        return Message::where(function ($query) use ($petId, $otherPetId) {
+        return $this->message->where(function ($query) use ($petId, $otherPetId) {
             $query->where('sender_pet_id', $petId)
                 ->where('receiver_pet_id', $otherPetId);
         })->orWhere(function ($query) use ($petId, $otherPetId) {
@@ -87,45 +81,60 @@ class MessageService extends BaseService implements MessageServiceInterface
 
     public function getConversations(int $petId)
     {
-        $pet = $this->petRepository->findById($petId);
+        $pet = Pet::find($petId);
 
         if (!$pet) {
-            throw new Exception(__('http.' . HttpStatusEnum::NOT_FOUND->value, ['attribute' => $this->petService->getModelName()]), HttpStatusEnum::NOT_FOUND->value);
+            throw new Exception(__('http.' . HttpStatusEnum::NOT_FOUND->value, ['attribute' => 'Pet']), HttpStatusEnum::NOT_FOUND->value);
         }
 
-        // Check permissions (User must own petId) - Assuming 'viewMatches' is enough or create 'viewConversations'
+        // Check permissions (User must own petId)
         if (!Gate::allows('viewMatches', $pet)) {
             throw new Exception(__('http.' . HttpStatusEnum::FORBIDDEN->value), HttpStatusEnum::FORBIDDEN->value);
         }
 
-        return $this->messageRepository->getConversations($petId);
+        $subQuery = $this->message->newQuery()
+            ->selectRaw('MAX(id) as id')
+            ->where('sender_pet_id', $petId)
+            ->orWhere('receiver_pet_id', $petId)
+            ->groupByRaw('CASE WHEN sender_pet_id = ? THEN receiver_pet_id ELSE sender_pet_id END', [$petId]);
+
+        return $this->message->newQuery()
+            ->whereIn('id', $subQuery)
+            ->with(['sender', 'receiver'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
     }
 
     public function getUnreadCount(int $petId)
     {
-        $pet = $this->petRepository->findById($petId);
+        $pet = Pet::find($petId);
         if (!$pet) {
-            throw new Exception(__('http.' . HttpStatusEnum::NOT_FOUND->value, ['attribute' => $this->petService->getModelName()]), HttpStatusEnum::NOT_FOUND->value);
+            throw new Exception(__('http.' . HttpStatusEnum::NOT_FOUND->value, ['attribute' => 'Pet']), HttpStatusEnum::NOT_FOUND->value);
         }
         // Access control: User must own the pet
         if (!Gate::allows('viewMatches', $pet)) {
             throw new Exception(__('http.' . HttpStatusEnum::FORBIDDEN->value), HttpStatusEnum::FORBIDDEN->value);
         }
 
-        return $this->messageRepository->getUnreadCount($petId);
+        return $this->message->where('receiver_pet_id', $petId)
+            ->whereNull('read_at')
+            ->count();
     }
 
     public function markAsRead(int $petId, int $otherPetId)
     {
-        $pet = $this->petRepository->findById($petId);
+        $pet = Pet::find($petId);
         if (!$pet) {
-            throw new Exception(__('http.' . HttpStatusEnum::NOT_FOUND->value, ['attribute' => $this->petService->getModelName()]), HttpStatusEnum::NOT_FOUND->value);
+            throw new Exception(__('http.' . HttpStatusEnum::NOT_FOUND->value, ['attribute' => 'Pet']), HttpStatusEnum::NOT_FOUND->value);
         }
 
         if (!Gate::allows('viewMatches', $pet)) {
             throw new Exception(__('http.' . HttpStatusEnum::FORBIDDEN->value), HttpStatusEnum::FORBIDDEN->value);
         }
 
-        $this->messageRepository->markAsRead($petId, $otherPetId);
+        $this->message->where('receiver_pet_id', $petId)
+            ->where('sender_pet_id', $otherPetId)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
     }
 }

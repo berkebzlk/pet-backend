@@ -5,12 +5,12 @@ namespace App\Modules\Message\Controllers;
 use App\Modules\Core\Enums\HttpStatusEnum;
 use App\Modules\Core\Helpers\ResponseHelper;
 use App\Modules\Message\Payload\Requests\SendMessageRequest;
-use App\Modules\Message\Services\MessageServiceInterface;
+use App\Modules\Message\Services\MessageService;
 use Illuminate\Routing\Controller;
 
 class MessageController extends Controller
 {
-    public function __construct(private MessageServiceInterface $messageService)
+    public function __construct(private MessageService $messageService)
     {
     }
 
