@@ -7,14 +7,14 @@ use App\Modules\Core\Enums\StatusEnum;
 use App\Modules\Core\Helpers\ResponseHelper;
 use App\Modules\Match\Payload\Requests\StoreMatchRequest;
 use App\Modules\Match\Payload\Resources\MatchResource;
-use App\Modules\Match\Services\MatchServiceInterface;
+use App\Modules\Match\Services\MatchService;
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 
 class MatchController extends Controller
 {
     public function __construct(
-        private MatchServiceInterface $matchService
+        private MatchService $matchService
     ) {
     }
 
