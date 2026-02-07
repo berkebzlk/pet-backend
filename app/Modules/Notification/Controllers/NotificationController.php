@@ -5,7 +5,7 @@ namespace App\Modules\Notification\Controllers;
 use App\Modules\Core\Enums\HttpStatusEnum;
 use App\Modules\Core\Helpers\ResponseHelper;
 use App\Modules\Notification\Payload\Resources\NotificationResource;
-use App\Modules\Notification\Services\NotificationServiceInterface;
+use App\Modules\Notification\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 class NotificationController extends Controller
 {
     public function __construct(
-        private NotificationServiceInterface $notificationService
+        private NotificationService $notificationService
     ) {
     }
 

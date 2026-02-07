@@ -2,18 +2,13 @@
 
 namespace App\Modules\Notification\Providers;
 
-use App\Modules\Notification\Repositories\Impl\NotificationRepository;
-use App\Modules\Notification\Repositories\NotificationRepositoryInterface;
-use App\Modules\Notification\Services\Impl\NotificationService;
-use App\Modules\Notification\Services\NotificationServiceInterface;
 use Illuminate\Support\ServiceProvider;
 
 class NotificationServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        $this->app->bind(NotificationRepositoryInterface::class, NotificationRepository::class);
-        $this->app->bind(NotificationServiceInterface::class, NotificationService::class);
+        //
     }
 
     public function boot()
