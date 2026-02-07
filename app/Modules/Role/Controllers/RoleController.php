@@ -8,15 +8,16 @@ use App\Modules\Core\Payload\Resources\PaginatedResource;
 use App\Modules\Role\Payload\Requests\StoreRoleRequest;
 use App\Modules\Role\Payload\Requests\UpdateRoleRequest;
 use App\Modules\Role\Payload\Resources\RoleResource;
-use App\Modules\Role\Services\RoleServiceInterface;
+use App\Modules\Role\Services\RoleService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
 class RoleController extends Controller
 {
     public function __construct(
-        private RoleServiceInterface $roleService
-    ) {}
+        private RoleService $roleService
+    ) {
+    }
 
     public function store(StoreRoleRequest $request)
     {
