@@ -6,7 +6,7 @@ use App\Modules\Core\Enums\HttpStatusEnum;
 use App\Modules\Core\Helpers\ResponseHelper;
 use App\Modules\Core\Payload\Resources\PaginatedResource;
 use App\Modules\Post\Payload\Requests\StoreCommentRequest;
-use App\Modules\Post\Services\CommentServiceInterface;
+use App\Modules\Post\Services\CommentService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Auth;
 class CommentController extends Controller
 {
     public function __construct(
-        private CommentServiceInterface $commentService
+        private CommentService $commentService
     ) {
     }
 

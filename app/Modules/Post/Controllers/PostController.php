@@ -6,14 +6,15 @@ use App\Modules\Core\Enums\HttpStatusEnum;
 use App\Modules\Core\Helpers\ResponseHelper;
 use App\Modules\Post\Payload\Requests\StorePostRequest;
 use App\Modules\Post\Payload\Resources\PostResource;
-use App\Modules\Post\Services\PostServiceInterface;
+use App\Modules\Post\Payload\Resources\PostMinimalResource;
+use App\Modules\Post\Services\Impl\PostService;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
     public function __construct(
-        private PostServiceInterface $postService
+        private PostService $postService
     ) {
     }
 

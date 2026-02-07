@@ -4,14 +4,14 @@ namespace App\Modules\Post\Controllers;
 
 use App\Modules\Core\Enums\HttpStatusEnum;
 use App\Modules\Core\Helpers\ResponseHelper;
-use App\Modules\Post\Services\LikeServiceInterface;
+use App\Modules\Post\Services\LikeService;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 
 class LikeController extends Controller
 {
     public function __construct(
-        private LikeServiceInterface $likeService
+        private LikeService $likeService
     ) {
     }
 

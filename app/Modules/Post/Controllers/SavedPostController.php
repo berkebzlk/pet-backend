@@ -4,14 +4,14 @@ namespace App\Modules\Post\Controllers;
 
 use App\Modules\Core\Enums\HttpStatusEnum;
 use App\Modules\Core\Helpers\ResponseHelper;
-use App\Modules\Post\Services\SavedPostServiceInterface;
+use App\Modules\Post\Services\SavedPostService;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 
 class SavedPostController extends Controller
 {
     public function __construct(
-        private SavedPostServiceInterface $savedPostService
+        private SavedPostService $savedPostService
     ) {
     }
 
