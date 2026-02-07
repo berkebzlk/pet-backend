@@ -8,14 +8,14 @@ use App\Modules\Core\Payload\Resources\PaginatedResource;
 use App\Modules\Pet\Payload\Requests\StorePetRequest;
 use App\Modules\Pet\Payload\Requests\UpdatePetRequest;
 use App\Modules\Pet\Payload\Resources\PetResource;
-use App\Modules\Pet\Services\PetServiceInterface;
+use App\Modules\Pet\Services\PetService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
 class PetController extends Controller
 {
     public function __construct(
-        private PetServiceInterface $petService
+        private PetService $petService
     ) {
     }
 
