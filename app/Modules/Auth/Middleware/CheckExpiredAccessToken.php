@@ -18,6 +18,11 @@ class CheckExpiredAccessToken
             return $next($request);
         }
 
+        // Skip for login route
+        if ($request->routeIs('login') || $request->is('api/auth/login')) {
+            return $next($request);
+        }
+
         $parts = explode('.', $bearer);
         if (count($parts) !== 3) {
             return $next($request);
