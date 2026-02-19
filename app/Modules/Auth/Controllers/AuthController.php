@@ -7,8 +7,6 @@ use App\Modules\Auth\Requests\RegisterRequest;
 use App\Modules\Auth\Resources\AuthResource;
 use App\Modules\Auth\Services\AuthService;
 use App\Modules\Core\Helpers\ResponseHelper;
-use Auth;
-use Http;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
