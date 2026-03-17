@@ -5,7 +5,6 @@ namespace App\Modules\Pet\Database\Seeders;
 use App\Modules\Pet\Models\Pet;
 use App\Modules\User\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
@@ -13,14 +12,6 @@ class PetSeeder extends Seeder
 {
     public function run(): void
     {
-        // Ensure storage directory exists
-        if (!Storage::disk('public')->exists('pets')) {
-            Storage::disk('public')->makeDirectory('pets');
-        }
-
-        // Desktop path for images
-        $desktopPath = '/home/berke/Desktop';
-
         for ($i = 1; $i <= 10; $i++) {
             // Create User
             $user = User::create([
@@ -30,24 +21,9 @@ class PetSeeder extends Seeder
                 'password' => Hash::make('123123123'),
             ]);
 
-            // Determine image source
-            $imageName = "dog$i";
-            $extensions = ['jpg', 'jpeg', 'png', 'webp'];
-            $sourcePath = null;
-            $extension = null;
-
-            foreach ($extensions as $ext) {
-                $path = "$desktopPath/$imageName.$ext";
-                if (File::exists($path)) {
-                    $sourcePath = $path;
-                    $extension = $ext;
-                    break;
-                }
-            }
-
             $petUsername = "dog{$i}_username";
 
-            // Create Pet without image first
+            // Create Pet
             $pet = Pet::create([
                 'user_id' => $user->id,
                 'name' => "Dog $i",
@@ -59,27 +35,23 @@ class PetSeeder extends Seeder
                 'is_neutered' => (bool) rand(0, 1),
                 'bio' => "I am Dog $i. I love playing fetch!",
                 'username' => $petUsername,
-                'image' => null, // Will update after upload
+                'image' => null, // Will update after checking storage
                 'posts_count' => rand(0, 50),
                 'match_count' => rand(0, 50),
+                'is_breeding_available' => (bool) rand(0, 1),
             ]);
 
-            if ($sourcePath) {
-                // Create directory structure: users/{user_id}/pets/{pet_id}/profilePhoto/
-                $targetDir = "users/{$user->id}/pets/{$pet->id}/profilePhoto";
+            // Determine image source from backend storage
+            $extensions = ['jpg', 'jpeg', 'png', 'webp'];
 
-                // Create directory in public disk
-                Storage::disk('public')->makeDirectory($targetDir);
+            foreach ($extensions as $ext) {
+                $targetPath = "users/{$user->id}/pets/{$pet->id}/profilePhoto/profile.$ext";
 
-                // Generate filename
-                $fileName = "profile.$extension";
-                $targetPath = "$targetDir/$fileName";
-
-                // Copy file
-                Storage::disk('public')->put($targetPath, File::get($sourcePath));
-
-                // Update pet with image path
-                $pet->update(['image' => $targetPath]);
+                if (Storage::disk('public')->exists($targetPath)) {
+                    // Update pet with image path
+                    $pet->update(['image' => $targetPath]);
+                    break;
+                }
             }
         }
     }

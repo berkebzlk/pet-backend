@@ -25,6 +25,7 @@ return new class extends Migration {
             $table->string('username')->unique()->index();
             $table->integer('posts_count')->default(0);
             $table->integer('match_count')->default(0);
+            $table->boolean('is_breeding_available')->default(false);
             $table->timestamps();
         });
     }

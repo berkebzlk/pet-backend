@@ -10,7 +10,7 @@
 -- sudo chmod 600 storage/oauth-private.key
 -- sudo chmod 600 storage/oauth-public.key
 
-php artisan passport:keys
+php artisan passport:keys --force
 php artisan passport:client --personal
 php artisan passport:client --password
 

@@ -28,11 +28,13 @@ class Pet extends Model
         'username',
         'posts_count',
         'match_count',
+        'is_breeding_available',
     ];
 
     protected $casts = [
         'birthdate' => 'date',
         'is_neutered' => 'boolean',
+        'is_breeding_available' => 'boolean',
         'weight' => 'decimal:2',
     ];
 
@@ -64,6 +66,16 @@ class Pet extends Model
     public function receivedMatches(): HasMany
     {
         return $this->hasMany(\App\Modules\Match\Models\PetMatch::class, 'target_pet_id');
+    }
+
+    public function initiatedBreedingConnections(): HasMany
+    {
+        return $this->hasMany(\App\Modules\Breeding\Models\BreedingConnection::class, 'initiator_pet_id');
+    }
+
+    public function receivedBreedingConnections(): HasMany
+    {
+        return $this->hasMany(\App\Modules\Breeding\Models\BreedingConnection::class, 'target_pet_id');
     }
 
     public function receivedLikes(): \Illuminate\Database\Eloquent\Relations\HasManyThrough

@@ -29,8 +29,7 @@ class MakeModule extends Command
         // Klasör yapısını oluştur
         $directories = [
             'Controllers',
-            'Services/Impl',
-            'Repositories/Impl',
+            'Services',
             'Models',
             'Resources/lang/tr',
             'Resources/lang/en',
