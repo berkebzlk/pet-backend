@@ -4,7 +4,6 @@ namespace App\Modules\VideoCall\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -16,13 +15,9 @@ class WebRTCSignalEvent implements ShouldBroadcast
 
     public $callId;
     public $senderId;
-    public $receiverId;
     public $signalData;
     public $type; // offer, answer, ice-candidate
 
-    /**
-     * Create a new event instance.
-     */
     public function __construct(string $callId, int $senderId, int $receiverId, array $signalData, string $type)
     {
         $this->callId = $callId;
@@ -32,20 +27,16 @@ class WebRTCSignalEvent implements ShouldBroadcast
         $this->type = $type;
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
-     */
     public function broadcastOn(): array
     {
+        // Broadcast to the other person in the call
         return [
-            new PrivateChannel('user.' . $this->receiverId . '.calls'),
+            new PrivateChannel('user.' . $this->receiverId),
         ];
     }
-    
-    public function broadcastAs()
+
+    public function broadcastAs(): string
     {
-        return 'WebRTCSignal';
+        return 'video.webrtc.signal';
     }
 }

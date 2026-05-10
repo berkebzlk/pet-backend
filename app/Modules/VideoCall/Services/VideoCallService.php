@@ -5,47 +5,50 @@ namespace App\Modules\VideoCall\Services;
 use App\Modules\VideoCall\Events\CallAcceptedEvent;
 use App\Modules\VideoCall\Events\CallEndedEvent;
 use App\Modules\VideoCall\Events\CallInitiatedEvent;
-use App\Modules\VideoCall\Events\CallRejectedEvent;
 use App\Modules\VideoCall\Events\WebRTCSignalEvent;
 use App\Modules\VideoCall\Models\VideoCall;
 use Illuminate\Support\Str;
 
 class VideoCallService
 {
-    public function initiateCall(int $callerId, int $receiverId)
+    public function initiateCall(int $callerId, int $receiverId): VideoCall
     {
-        // Check if there is already an active call
-        $existingCall = VideoCall::whereIn('status', ['pending', 'accepted'])
+        // Prevent calling self
+        if ($callerId === $receiverId) {
+            throw new \Exception('You cannot call yourself.');
+        }
+
+        // Check for active calls
+        $activeCall = VideoCall::whereIn('status', ['pending', 'accepted'])
             ->where(function ($query) use ($callerId, $receiverId) {
-                $query->where(function ($q) use ($callerId, $receiverId) {
-                    $q->where('caller_id', $callerId)->where('receiver_id', $receiverId);
-                })->orWhere(function ($q) use ($callerId, $receiverId) {
-                    $q->where('caller_id', $receiverId)->where('receiver_id', $callerId);
-                });
+                $query->where('caller_id', $callerId)
+                    ->orWhere('receiver_id', $callerId)
+                    ->orWhere('caller_id', $receiverId)
+                    ->orWhere('receiver_id', $receiverId);
             })->first();
-            
-        if ($existingCall) {
-            throw new \Exception('There is already an active call with this user.');
+
+        if ($activeCall) {
+            throw new \Exception('One of the users is already in a call.');
         }
 
         $call = VideoCall::create([
             'caller_id' => $callerId,
             'receiver_id' => $receiverId,
             'status' => 'pending',
-            'room_name' => 'call_' . Str::random(10) . '_' . time(),
+            'room_name' => 'room_' . Str::random(12),
         ]);
 
-        broadcast(new CallInitiatedEvent($call));
+        broadcast(new CallInitiatedEvent($call))->toOthers();
 
         return $call;
     }
 
-    public function acceptCall(string $callId, int $userId)
+    public function acceptCall(string $callId, int $userId): VideoCall
     {
         $call = VideoCall::findOrFail($callId);
 
         if ($call->receiver_id !== $userId) {
-            throw new \Exception('Unauthorized access to this call.');
+            throw new \Exception('Unauthorized.');
         }
 
         $call->update([
@@ -53,35 +56,17 @@ class VideoCallService
             'started_at' => now(),
         ]);
 
-        broadcast(new CallAcceptedEvent($call));
+        broadcast(new CallAcceptedEvent($call))->toOthers();
 
         return $call;
     }
 
-    public function rejectCall(string $callId, int $userId)
+    public function endCall(string $callId, int $userId): VideoCall
     {
         $call = VideoCall::findOrFail($callId);
 
-        if ($call->receiver_id !== $userId && $call->caller_id !== $userId) {
-             throw new \Exception('Unauthorized access to this call.');
-        }
-
-        $call->update([
-            'status' => 'rejected',
-            'ended_at' => now(),
-        ]);
-
-        broadcast(new CallRejectedEvent($call));
-
-        return $call;
-    }
-
-    public function endCall(string $callId, int $userId)
-    {
-        $call = VideoCall::findOrFail($callId);
-
-        if ($call->receiver_id !== $userId && $call->caller_id !== $userId) {
-             throw new \Exception('Unauthorized access to this call.');
+        if ($call->caller_id !== $userId && $call->receiver_id !== $userId) {
+            throw new \Exception('Unauthorized.');
         }
 
         $call->update([
@@ -89,22 +74,15 @@ class VideoCallService
             'ended_at' => now(),
         ]);
 
-        broadcast(new CallEndedEvent($call));
+        $targetUserId = ($call->caller_id === $userId) ? $call->receiver_id : $call->caller_id;
+        broadcast(new CallEndedEvent($call, $targetUserId))->toOthers();
 
         return $call;
     }
 
-    public function sendSignal(string $callId, int $senderId, int $receiverId, array $signalData, string $type)
+    public function sendSignal(string $callId, int $senderId, int $receiverId, array $signalData, string $type): void
     {
-        $call = VideoCall::findOrFail($callId);
-        
-        // Ensure the sender is part of the call
-        if ($call->caller_id !== $senderId && $call->receiver_id !== $senderId) {
-            throw new \Exception('Unauthorized to send signals for this call.');
-        }
-
-        broadcast(new WebRTCSignalEvent($callId, $senderId, $receiverId, $signalData, $type));
-        
-        return true;
+        // Simple relay
+        broadcast(new WebRTCSignalEvent($callId, $senderId, $receiverId, $signalData, $type))->toOthers();
     }
 }

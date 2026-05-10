@@ -2,78 +2,63 @@
 
 namespace App\Modules\VideoCall\Controllers;
 
-use App\Modules\VideoCall\Requests\AcceptCallRequest;
-use App\Modules\VideoCall\Requests\InitiateCallRequest;
-use App\Modules\VideoCall\Requests\RejectCallRequest;
-use App\Modules\VideoCall\Requests\SignalRequest;
 use App\Modules\VideoCall\Services\VideoCallService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class VideoCallController
 {
-    protected VideoCallService $videoCallService;
+    public function __construct(protected VideoCallService $videoCallService) {}
 
-    public function __construct(VideoCallService $videoCallService)
+    public function initiate(Request $request): JsonResponse
     {
-        $this->videoCallService = $videoCallService;
+        $request->validate(['receiver_id' => 'required|exists:users,id']);
+
+        try {
+            $call = $this->videoCallService->initiateCall(auth()->id(), $request->receiver_id);
+            return response()->json($call);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
     }
 
-    public function initiate(InitiateCallRequest $request): JsonResponse
+    public function accept(string $id): JsonResponse
     {
         try {
-            $call = $this->videoCallService->initiateCall(
-                auth()->id(),
-                $request->validated('receiver_id')
-            );
-            return response()->json(['message' => 'Call initiated', 'call' => $call]);
+            $call = $this->videoCallService->acceptCall($id, auth()->id());
+            return response()->json($call);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 400);
+            return response()->json(['error' => $e->getMessage()], 422);
         }
     }
 
-    public function accept(AcceptCallRequest $request, string $callId): JsonResponse
+    public function end(string $id): JsonResponse
     {
         try {
-            $call = $this->videoCallService->acceptCall($callId, auth()->id());
-            return response()->json(['message' => 'Call accepted', 'call' => $call]);
+            $call = $this->videoCallService->endCall($id, auth()->id());
+            return response()->json($call);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 403);
+            return response()->json(['error' => $e->getMessage()], 422);
         }
     }
 
-    public function reject(RejectCallRequest $request, string $callId): JsonResponse
+    public function signal(Request $request): JsonResponse
     {
-         try {
-            $call = $this->videoCallService->rejectCall($callId, auth()->id());
-            return response()->json(['message' => 'Call rejected', 'call' => $call]);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 403);
-        }
-    }
+        $request->validate([
+            'call_id' => 'required|uuid',
+            'receiver_id' => 'required|exists:users,id',
+            'signal_data' => 'required|array',
+            'type' => 'required|string',
+        ]);
 
-    public function end(string $callId): JsonResponse
-    {
-        try {
-            $call = $this->videoCallService->endCall($callId, auth()->id());
-            return response()->json(['message' => 'Call ended', 'call' => $call]);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 403);
-        }
-    }
-    
-    public function signal(SignalRequest $request): JsonResponse
-    {
-        try {
-            $this->videoCallService->sendSignal(
-                $request->validated('call_id'),
-                auth()->id(),
-                $request->validated('receiver_id'),
-                $request->validated('signal_data'),
-                $request->validated('type')
-            );
-            return response()->json(['message' => 'Signal sent']);
-        } catch (\Exception $e) {
-             return response()->json(['error' => $e->getMessage()], 403);
-        }
+        $this->videoCallService->sendSignal(
+            $request->call_id,
+            auth()->id(),
+            $request->receiver_id,
+            $request->signal_data,
+            $request->type
+        );
+
+        return response()->json(['status' => 'signal_sent']);
     }
 }

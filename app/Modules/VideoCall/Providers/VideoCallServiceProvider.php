@@ -6,23 +6,13 @@ use Illuminate\Support\ServiceProvider;
 
 class VideoCallServiceProvider extends ServiceProvider
 {
-    /**
-     * Register services.
-     *
-     * @return void
-     */
-    public function register()
+    public function register(): void
     {
-        //
+        // Register any module specific services here
     }
 
-    /**
-     * Bootstrap services.
-     *
-     * @return void
-     */
-    public function boot()
+    public function boot(): void
     {
         //
     }
-} 
+}
