@@ -15,6 +15,7 @@ class WebRTCSignalEvent implements ShouldBroadcast
 
     public $callId;
     public $senderId;
+    public $receiverId;
     public $signalData;
     public $type; // offer, answer, ice-candidate
 

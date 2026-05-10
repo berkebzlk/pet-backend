@@ -83,6 +83,6 @@ class VideoCallService
     public function sendSignal(string $callId, int $senderId, int $receiverId, array $signalData, string $type): void
     {
         // Simple relay
-        broadcast(new WebRTCSignalEvent($callId, $senderId, $receiverId, $signalData, $type))->toOthers();
+        broadcast(new WebRTCSignalEvent($callId, $senderId, $receiverId, $signalData, $type));
     }
 }

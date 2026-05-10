@@ -18,7 +18,7 @@ class VideoCallController
             $call = $this->videoCallService->initiateCall(auth()->id(), $request->receiver_id);
             return response()->json($call);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 422);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
@@ -28,7 +28,7 @@ class VideoCallController
             $call = $this->videoCallService->acceptCall($id, auth()->id());
             return response()->json($call);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 422);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
@@ -38,7 +38,7 @@ class VideoCallController
             $call = $this->videoCallService->endCall($id, auth()->id());
             return response()->json($call);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 422);
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
