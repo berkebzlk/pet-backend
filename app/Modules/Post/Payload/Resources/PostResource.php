@@ -15,14 +15,18 @@ class PostResource extends JsonResource
             'image_url' => asset(Storage::url($this->image_url)),
             'description' => $this->description,
             'created_at' => $this->created_at,
-            'pet' => $this->whenLoaded('pet', function () {
-                return [
-                    'id' => $this->pet->id,
-                    'name' => $this->pet->name,
-                    'username' => $this->pet->username,
-                    'image' => $this->pet->image ? asset(Storage::url($this->pet->image)) : null,
-                ];
-            }),
+            'pet' => $this->pet ? [
+                'id' => $this->pet->id,
+                'name' => $this->pet->name,
+                'username' => $this->pet->username,
+                'image' => $this->pet->image ? asset(Storage::url($this->pet->image)) : null,
+            ] : ($this->veterinaryProfile ? [
+                'id' => $this->veterinaryProfile->id,
+                'name' => $this->veterinaryProfile->clinic_name,
+                'username' => $this->veterinaryProfile->clinic_name,
+                'image' => $this->veterinaryProfile->profile_photo ? asset(Storage::url($this->veterinaryProfile->profile_photo)) : null,
+                'isClinic' => true,
+            ] : null),
             'likes_count' => $this->likes_count ?? 0,
             'comments_count' => $this->comments_count ?? 0,
             'is_liked' => (bool) $this->is_liked,

@@ -19,14 +19,30 @@ class PostController extends Controller
 
     public function store(StorePostRequest $request)
     {
-        // Verify pet ownership
-        $pet = Auth::user()->pets()->findOrFail($request->pet_id);
+        $petId = $request->pet_id;
+        $vetId = $request->veterinary_profile_id;
 
-        $post = $this->postService->createPost(
-            $pet->id,
-            $request->file('image'),
-            $request->description
-        );
+        if ($petId) {
+            // Verify pet ownership
+            $pet = Auth::user()->pets()->findOrFail($petId);
+            $post = $this->postService->createPost(
+                $pet->id,
+                $request->file('image'),
+                $request->description
+            );
+        } else {
+            // Verify veterinary profile ownership
+            $vet = Auth::user()->veterinaryProfile;
+            if (!$vet || $vet->id !== (int)$vetId) {
+                abort(403, 'Unauthorized');
+            }
+            $post = $this->postService->createPost(
+                null,
+                $request->file('image'),
+                $request->description,
+                $vet->id
+            );
+        }
 
         return ResponseHelper::success(new PostResource($post), HttpStatusEnum::CREATED->value, trans('post::post.created'));
     }
@@ -59,9 +75,17 @@ class PostController extends Controller
     public function delete($id)
     {
         $post = $this->postService->show($id);
-        $post->load('pet');
+        $post->load(['pet', 'veterinaryProfile']);
 
-        if ($post->pet->user_id !== Auth::id()) {
+        if ($post->pet) {
+            if ($post->pet->user_id !== Auth::id()) {
+                return ResponseHelper::error('Unauthorized', HttpStatusEnum::FORBIDDEN->value);
+            }
+        } elseif ($post->veterinaryProfile) {
+            if ($post->veterinaryProfile->user_id !== Auth::id()) {
+                return ResponseHelper::error('Unauthorized', HttpStatusEnum::FORBIDDEN->value);
+            }
+        } else {
             return ResponseHelper::error('Unauthorized', HttpStatusEnum::FORBIDDEN->value);
         }
 

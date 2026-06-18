@@ -17,7 +17,8 @@ class StorePostRequest extends BaseRequest
         return [
             'image' => ['required', 'image', 'max:10240'], // 10MB
             'description' => ['nullable', 'string', 'max:1000'],
-            'pet_id' => ['required', 'exists:pets,id'],
+            'pet_id' => ['required_without:veterinary_profile_id', 'nullable', 'exists:pets,id'],
+            'veterinary_profile_id' => ['required_without:pet_id', 'nullable', 'exists:veterinary_profiles,id'],
         ];
     }
 

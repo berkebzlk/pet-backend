@@ -12,6 +12,7 @@ class Post extends Model
 
     protected $fillable = [
         'pet_id',
+        'veterinary_profile_id',
         'image_url',
         'description',
     ];
@@ -19,6 +20,11 @@ class Post extends Model
     public function pet()
     {
         return $this->belongsTo(Pet::class);
+    }
+
+    public function veterinaryProfile()
+    {
+        return $this->belongsTo(\App\Modules\Veterinary\Models\VeterinaryProfile::class);
     }
 
     public function likes()

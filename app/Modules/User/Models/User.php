@@ -169,4 +169,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Pet::class);
     }
+
+    public function veterinaryProfile(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(\App\Modules\Veterinary\Models\VeterinaryProfile::class);
+    }
 }

@@ -31,11 +31,12 @@ class PostService extends BaseEloquentService
         }
     }
 
-    public function createPost(int $petId, UploadedFile $image, ?string $description)
+    public function createPost(?int $petId, UploadedFile $image, ?string $description, ?int $veterinaryProfileId = null)
     {
-        return DB::transaction(function () use ($petId, $image, $description) {
+        return DB::transaction(function () use ($petId, $image, $description, $veterinaryProfileId) {
             $post = $this->post->create([
                 'pet_id' => $petId,
+                'veterinary_profile_id' => $veterinaryProfileId,
                 'image_url' => '', // Temporary
                 'description' => $description,
             ]);
@@ -43,7 +44,8 @@ class PostService extends BaseEloquentService
             $userId = auth()->id();
 
             try {
-                $path = $image->store("users/{$userId}/pets/{$petId}/posts/{$post->id}", 'public');
+                $subFolder = $petId ? "pets/{$petId}" : "veterinary/{$veterinaryProfileId}";
+                $path = $image->store("users/{$userId}/{$subFolder}/posts/{$post->id}", 'public');
 
                 if (!$path) {
                     throw new \Exception("Failed to store image file.");
@@ -60,28 +62,28 @@ class PostService extends BaseEloquentService
 
     public function getFeed(?int $viewingPetId = null)
     {
-        $query = $this->post->with('pet')->latest();
+        $query = $this->post->with(['pet', 'veterinaryProfile'])->latest();
         $this->applyViewingPet($query, $viewingPetId);
         return $query->get();
     }
 
     public function getPetPosts(int $petId, ?int $viewingPetId = null)
     {
-        $query = $this->post->where('pet_id', $petId)->with('pet')->latest();
+        $query = $this->post->where('pet_id', $petId)->with(['pet', 'veterinaryProfile'])->latest();
         $this->applyViewingPet($query, $viewingPetId);
         return $query->get();
     }
 
     public function getRandomPosts(int $limit = 20, ?int $viewingPetId = null)
     {
-        $query = $this->post->inRandomOrder()->limit($limit)->with('pet');
+        $query = $this->post->inRandomOrder()->limit($limit)->with(['pet', 'veterinaryProfile']);
         $this->applyViewingPet($query, $viewingPetId);
         return $query->get();
     }
 
     public function getBatch(array $ids, ?int $viewingPetId = null)
     {
-        $query = $this->post->whereIn('id', $ids)->with('pet');
+        $query = $this->post->whereIn('id', $ids)->with(['pet', 'veterinaryProfile']);
         $this->applyViewingPet($query, $viewingPetId);
 
         // Maintain the order of IDs (MySQL specific, skip for SQLite testing)

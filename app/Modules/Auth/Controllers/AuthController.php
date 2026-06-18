@@ -10,6 +10,7 @@ use App\Modules\Core\Helpers\ResponseHelper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use App\Modules\User\Payload\Resources\UserResource;
 
 class AuthController extends Controller
 {
@@ -43,7 +44,7 @@ class AuthController extends Controller
     {
         $user = $this->authService->getCurrentUser($request->user());
 
-        return ResponseHelper::success($user);
+        return ResponseHelper::success(new UserResource($user));
     }
 
     public function refresh(Request $request): JsonResponse
