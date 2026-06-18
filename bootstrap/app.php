@@ -49,6 +49,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         // Validation Exception
         $exceptions->renderable(function (\Illuminate\Validation\ValidationException $e) {
+            if (!request()->expectsJson() && !request()->is('api/*')) {
+                return null;
+            }
             $response = createResponse('VALIDATION_ERROR', __('validation.invalid'), $e->errors());
 
             if (!app()->isProduction()) {
@@ -60,6 +63,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Auth Exception
         $exceptions->renderable(function (\Illuminate\Auth\AuthenticationException $e) {
+            if (!request()->expectsJson() && !request()->is('api/*')) {
+                return null;
+            }
             $response = createResponse('AUTH_ERROR', __('http.' . HttpStatusEnum::UNAUTHORIZED->value));
 
             if (!app()->isProduction()) {
@@ -71,6 +77,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Custom expired token response (401 with specific error_code)
         $exceptions->renderable(function (ExpiredAccessTokenException $e) {
+            if (!request()->expectsJson() && !request()->is('api/*')) {
+                return null;
+            }
             $response = createResponse('TOKEN_EXPIRED', __('http.' . HttpStatusEnum::UNAUTHORIZED->value));
 
             if (!app()->isProduction()) {
@@ -82,6 +91,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Forbidden (authorization)
         $exceptions->renderable(function (\Illuminate\Auth\Access\AuthorizationException $e) {
+            if (!request()->expectsJson() && !request()->is('api/*')) {
+                return null;
+            }
             $response = createResponse('FORBIDDEN', __('http.' . HttpStatusEnum::FORBIDDEN->value));
 
             if (!app()->isProduction()) {
@@ -93,6 +105,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Model not found
         $exceptions->renderable(function (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            if (!request()->expectsJson() && !request()->is('api/*')) {
+                return null;
+            }
             $response = createResponse('NOT_FOUND', __('http.' . HttpStatusEnum::NOT_FOUND->value));
 
             if (!app()->isProduction()) {
@@ -104,6 +119,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // HTTP errors - farklı exception türleri için
         $exceptions->renderable(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e) {
+            if (!request()->expectsJson() && !request()->is('api/*')) {
+                return null;
+            }
             $response = createResponse('NOT_FOUND', __('http.' . HttpStatusEnum::NOT_FOUND->value));
 
             if (!app()->isProduction()) {
@@ -114,6 +132,9 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->renderable(function (\Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException $e) {
+            if (!request()->expectsJson() && !request()->is('api/*')) {
+                return null;
+            }
             $response = createResponse('METHOD_NOT_ALLOWED', __('http.' . HttpStatusEnum::METHOD_NOT_ALLOWED->value));
 
             if (!app()->isProduction()) {
@@ -125,6 +146,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // General / unexpected exceptions
         $exceptions->renderable(function (\Throwable $e) {
+            if (!request()->expectsJson() && !request()->is('api/*')) {
+                return null;
+            }
             $response = createResponse('INTERNAL_ERROR', __('http.' . HttpStatusEnum::INTERNAL_SERVER_ERROR->value));
 
             if (!app()->isProduction()) {
