@@ -6,6 +6,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -25,10 +26,10 @@ class VeterinaryProfilesTable
                     ->searchable(),
                 TextColumn::make('website')
                     ->searchable(),
-                TextColumn::make('profile_photo')
-                    ->searchable(),
-                TextColumn::make('cover_photo')
-                    ->searchable(),
+                ImageColumn::make('profile_photo')
+                    ->disk('public'),
+                ImageColumn::make('cover_photo')
+                    ->disk('public'),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
