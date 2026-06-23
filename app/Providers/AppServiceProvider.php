@@ -34,5 +34,10 @@ class AppServiceProvider extends ServiceProvider
         // Passport::tokensExpireIn(CarbonInterval::minutes(15));
         Passport::tokensExpireIn(CarbonInterval::days(7)); // for testing
         Passport::refreshTokensExpireIn(CarbonInterval::days(7));
+
+        // Grant all permissions to admin role
+        \Illuminate\Support\Facades\Gate::before(function ($user, $ability) {
+            return $user->hasRole('admin') ? true : null;
+        });
     }
 }
