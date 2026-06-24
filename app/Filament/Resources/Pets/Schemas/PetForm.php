@@ -43,11 +43,13 @@ class PetForm
                 TextInput::make('posts_count')
                     ->required()
                     ->numeric()
-                    ->default(0),
+                    ->default(0)
+                    ->disabled(),
                 TextInput::make('match_count')
                     ->required()
                     ->numeric()
-                    ->default(0),
+                    ->default(0)
+                    ->disabled(),
                 Toggle::make('is_breeding_available')
                     ->required(),
             ]);

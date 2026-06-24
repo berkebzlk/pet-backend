@@ -10,6 +10,7 @@ use App\Filament\Resources\Pets\Schemas\PetForm;
 use App\Filament\Resources\Pets\Schemas\PetInfolist;
 use App\Filament\Resources\Pets\Tables\PetsTable;
 use App\Modules\Pet\Models\Pet;
+use App\Filament\Resources\Pets\RelationManagers\PostsRelationManager;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -42,7 +43,7 @@ class PetResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            PostsRelationManager::class,
         ];
     }
 
