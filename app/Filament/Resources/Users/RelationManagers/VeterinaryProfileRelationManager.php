@@ -3,12 +3,12 @@
 namespace App\Filament\Resources\Users\RelationManagers;
 
 use App\Filament\Resources\VeterinaryProfiles\VeterinaryProfileResource;
-use Filament\Actions\CreateAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
+use Filament\Tables\Actions\CreateAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
 
 class VeterinaryProfileRelationManager extends RelationManager
 {
@@ -16,16 +16,36 @@ class VeterinaryProfileRelationManager extends RelationManager
 
     protected static ?string $relatedResource = VeterinaryProfileResource::class;
 
+    protected static ?string $title = 'Klinik Profili';
+
     public function table(Table $table): Table
     {
         return $table
             ->columns([
                 TextColumn::make('clinic_name')
+                    ->label('Klinik Adı')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('city')
+                    ->label('Şehir')
                     ->searchable(),
-                TextColumn::make('phone'),
+                TextColumn::make('phone')
+                    ->label('Telefon'),
+                TextColumn::make('approval_status')
+                    ->label('Onay Durumu')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'approved' => 'success',
+                        'pending' => 'warning',
+                        'rejected' => 'danger',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'approved' => 'Onaylandı',
+                        'pending' => 'Beklemede',
+                        'rejected' => 'Reddedildi',
+                        default => $state,
+                    }),
             ])
             ->headerActions([
                 CreateAction::make(),

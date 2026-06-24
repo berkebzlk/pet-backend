@@ -21,6 +21,8 @@ class VeterinaryProfile extends Model
         'specialties',
         'profile_photo',
         'cover_photo',
+        'approval_status',
+        'rejection_reason',
     ];
 
     protected $casts = [
