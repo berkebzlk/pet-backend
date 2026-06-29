@@ -21,6 +21,8 @@ class VeterinaryProfileResource extends JsonResource
             'specialties' => $this->specialties ?? [],
             'profilePhoto' => $this->profile_photo ? asset(Storage::url($this->profile_photo)) : null,
             'coverPhoto' => $this->cover_photo ? asset(Storage::url($this->cover_photo)) : null,
+            'averageRating' => (float) ($this->average_rating ?? 0),
+            'reviewsCount' => (int) ($this->reviews_count ?? 0),
             'createdAt' => $this->created_at,
             'updatedAt' => $this->updated_at,
         ];

@@ -9,6 +9,8 @@ use App\Modules\Veterinary\Payload\Requests\StoreVeterinaryProfileRequest;
 use App\Modules\Veterinary\Payload\Resources\VeterinaryProfileResource;
 use App\Modules\Veterinary\Services\VeterinaryProfileService;
 use App\Modules\Post\Payload\Resources\PostResource;
+use App\Modules\Veterinary\Payload\Requests\StoreVeterinaryReviewRequest;
+use App\Modules\Veterinary\Payload\Resources\VeterinaryReviewResource;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
@@ -76,6 +78,49 @@ class VeterinaryController extends Controller
         try {
             $posts = $this->veterinaryProfileService->getPosts($id);
             return ResponseHelper::success(PostResource::collection($posts), HttpStatusEnum::OK->value);
+        } catch (\Exception $e) {
+            return ResponseHelper::error(
+                $e->getMessage(),
+                HttpStatusEnum::BAD_REQUEST->value
+            );
+        }
+    }
+
+    public function getReviews($id)
+    {
+        try {
+            $reviews = $this->veterinaryProfileService->getReviews($id);
+            return ResponseHelper::success(VeterinaryReviewResource::collection($reviews), HttpStatusEnum::OK->value);
+        } catch (\Exception $e) {
+            return ResponseHelper::error(
+                $e->getMessage(),
+                HttpStatusEnum::BAD_REQUEST->value
+            );
+        }
+    }
+
+    public function addReview(StoreVeterinaryReviewRequest $request, $id)
+    {
+        try {
+            $review = $this->veterinaryProfileService->addOrUpdateReview($id, $request->validated());
+            return ResponseHelper::success(
+                new VeterinaryReviewResource($review),
+                HttpStatusEnum::CREATED->value,
+                __('crud.created', ['attribute' => 'Review'])
+            );
+        } catch (\Exception $e) {
+            return ResponseHelper::error(
+                $e->getMessage(),
+                $e->getCode() ?: HttpStatusEnum::BAD_REQUEST->value
+            );
+        }
+    }
+
+    public function getCities()
+    {
+        try {
+            $cities = $this->veterinaryProfileService->getCities();
+            return ResponseHelper::success($cities, HttpStatusEnum::OK->value);
         } catch (\Exception $e) {
             return ResponseHelper::error(
                 $e->getMessage(),

@@ -6,6 +6,7 @@ use App\Modules\Core\Enums\HttpStatusEnum;
 use App\Modules\Core\Helpers\ResponseHelper;
 use App\Modules\Core\Payload\Resources\PaginatedResource;
 use App\Modules\Post\Payload\Requests\StoreCommentRequest;
+use App\Modules\Post\Payload\Resources\CommentResource;
 use App\Modules\Post\Services\CommentService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -27,7 +28,8 @@ class CommentController extends Controller
         ];
 
         $comment = $this->commentService->store($data);
-        return ResponseHelper::success($comment, HttpStatusEnum::CREATED->value, trans('post::post.comment_added'));
+        $comment->load('pet');
+        return ResponseHelper::success(new CommentResource($comment), HttpStatusEnum::CREATED->value, trans('post::post.comment_added'));
     }
 
     public function destroy($postId, $commentId)
@@ -39,6 +41,6 @@ class CommentController extends Controller
     public function getCommentsByPostId($postId)
     {
         $comments = $this->commentService->getCommentsByPostId($postId, request()->all());
-        return ResponseHelper::success(new PaginatedResource($comments));
+        return ResponseHelper::success(new PaginatedResource($comments, CommentResource::class));
     }
 }

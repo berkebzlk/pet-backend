@@ -23,14 +23,28 @@ class VeterinaryProfile extends Model
         'cover_photo',
         'approval_status',
         'rejection_reason',
+        'average_rating',
+        'reviews_count',
     ];
 
     protected $casts = [
         'specialties' => 'array',
+        'average_rating' => 'decimal:2',
+        'reviews_count' => 'integer',
     ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function reviews(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(VeterinaryReview::class);
+    }
+
+    public function getSortableFields(): array
+    {
+        return ['clinic_name', 'average_rating', 'created_at', 'id'];
     }
 }
