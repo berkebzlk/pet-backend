@@ -29,28 +29,11 @@ class UserSearchTest extends TestCase
         config(['passport.public_key' => $publicKey]);
     }
 
-    public function test_can_search_users_by_username()
-    {
-        User::factory()->create(['username' => 'john_doe', 'name' => 'John Doe']);
-        User::factory()->create(['username' => 'jane_doe', 'name' => 'Jane Doe']);
-        User::factory()->create(['username' => 'bob_smith', 'name' => 'Bob Smith']);
-
-        $user = User::factory()->create();
-
-        $response = $this->actingAs($user, 'api')->getJson('/api/user/search?q=doe');
-
-        $response->assertOk();
-        $response->assertJsonCount(2, 'data');
-        $response->assertJsonFragment(['username' => 'john_doe']);
-        $response->assertJsonFragment(['username' => 'jane_doe']);
-        $response->assertJsonMissing(['username' => 'bob_smith']);
-    }
-
     public function test_can_search_users_by_name()
     {
-        User::factory()->create(['username' => 'u1', 'name' => 'Michael Scott']);
-        User::factory()->create(['username' => 'u2', 'name' => 'Michael Jordan']);
-        User::factory()->create(['username' => 'u3', 'name' => 'Dwight Schrute']);
+        User::factory()->create(['name' => 'Michael Scott']);
+        User::factory()->create(['name' => 'Michael Jordan']);
+        User::factory()->create(['name' => 'Dwight Schrute']);
 
         $user = User::factory()->create();
 

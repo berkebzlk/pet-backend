@@ -27,10 +27,7 @@ class UserService extends BaseEloquentService
 
     public function searchUsers(string $searchText, array $requestData)
     {
-        $query = $this->user->newQuery()->where(function ($q) use ($searchText) {
-            $q->where('username', 'like', "%{$searchText}%")
-                ->orWhere('name', 'like', "%{$searchText}%");
-        });
+        $query = $this->user->newQuery()->where('name', 'like', "%{$searchText}%");
 
         return $this->index($requestData, $query);
     }

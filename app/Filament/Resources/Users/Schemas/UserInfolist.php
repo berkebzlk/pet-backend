@@ -12,7 +12,6 @@ class UserInfolist
         return $schema
             ->components([
                 TextEntry::make('name'),
-                TextEntry::make('username'),
                 TextEntry::make('email'),
                 TextEntry::make('roles.name')
                     ->badge()

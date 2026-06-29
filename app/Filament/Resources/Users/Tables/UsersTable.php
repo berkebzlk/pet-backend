@@ -18,9 +18,6 @@ class UsersTable
                 TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('username')
-                    ->searchable()
-                    ->sortable(),
                 TextColumn::make('email')
                     ->searchable()
                     ->sortable(),

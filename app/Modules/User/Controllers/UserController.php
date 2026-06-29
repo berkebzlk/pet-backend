@@ -64,6 +64,9 @@ class UserController extends Controller
     public function search(Request $request): JsonResponse
     {
         $searchText = $request->query('q');
+        if (empty($searchText)) {
+            return ResponseHelper::success([]);
+        }
         $users = $this->userService->searchUsers($searchText, $request->all());
         return ResponseHelper::success(UserResource::collection($users));
     }
