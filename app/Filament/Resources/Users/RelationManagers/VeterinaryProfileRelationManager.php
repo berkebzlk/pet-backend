@@ -4,9 +4,9 @@ namespace App\Filament\Resources\Users\RelationManagers;
 
 use App\Filament\Resources\VeterinaryProfiles\VeterinaryProfileResource;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Actions\CreateAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -34,13 +34,13 @@ class VeterinaryProfileRelationManager extends RelationManager
                 TextColumn::make('approval_status')
                     ->label('Onay Durumu')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'approved' => 'success',
                         'pending' => 'warning',
                         'rejected' => 'danger',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
                         'approved' => 'Onaylandı',
                         'pending' => 'Beklemede',
                         'rejected' => 'Reddedildi',

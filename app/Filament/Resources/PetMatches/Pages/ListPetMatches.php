@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Filament\Resources\PetMatches\Pages;
+
+use App\Filament\Resources\PetMatches\PetMatchResource;
+use Filament\Actions\CreateAction;
+use Filament\Resources\Pages\ListRecords;
+
+class ListPetMatches extends ListRecords
+{
+    protected static string $resource = PetMatchResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            //
+        ];
+    }
+}
