@@ -43,6 +43,21 @@ class VeterinaryProfile extends Model
         return $this->hasMany(VeterinaryReview::class);
     }
 
+    public function availabilities(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(VeterinaryAvailability::class);
+    }
+
+    public function exceptions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(VeterinaryException::class);
+    }
+
+    public function appointments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Appointment::class);
+    }
+
     public function getSortableFields(): array
     {
         return ['clinic_name', 'average_rating', 'created_at', 'id'];

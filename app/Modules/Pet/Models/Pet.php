@@ -58,6 +58,11 @@ class Pet extends Model
         return $this->hasMany(\App\Modules\Post\Models\Post::class);
     }
 
+    public function appointments(): HasMany
+    {
+        return $this->hasMany(\App\Modules\Veterinary\Models\Appointment::class);
+    }
+
     public function initiatedMatches(): HasMany
     {
         return $this->hasMany(\App\Modules\Match\Models\PetMatch::class, 'initiator_pet_id');
