@@ -36,7 +36,7 @@ class BreedingController extends Controller
         ]);
 
         $requests = $this->breedingService->getPendingRequests($request->input('pet_id'));
-        return ResponseHelper::success($requests, HttpStatusEnum::OK->value, 'Pending breeding requests retrieved successfully.');
+        return ResponseHelper::success(\App\Modules\Breeding\Payload\Resources\BreedingConnectionResource::collection($requests), HttpStatusEnum::OK->value, 'Pending breeding requests retrieved successfully.');
     }
 
     public function store(Request $request)
@@ -47,13 +47,13 @@ class BreedingController extends Controller
         ]);
 
         $connection = $this->breedingService->store($data);
-        return ResponseHelper::success($connection, HttpStatusEnum::CREATED->value, 'Breeding request sent successfully.');
+        return ResponseHelper::success(new \App\Modules\Breeding\Payload\Resources\BreedingConnectionResource($connection), HttpStatusEnum::CREATED->value, 'Breeding request sent successfully.');
     }
 
     public function accept(int $id)
     {
         $connection = $this->breedingService->accept($id);
-        return ResponseHelper::success($connection, HttpStatusEnum::OK->value, 'Breeding request accepted.');
+        return ResponseHelper::success(new \App\Modules\Breeding\Payload\Resources\BreedingConnectionResource($connection), HttpStatusEnum::OK->value, 'Breeding request accepted.');
     }
 
     public function reject(int $id)
@@ -71,6 +71,17 @@ class BreedingController extends Controller
     public function index(int $petId)
     {
         $connections = $this->breedingService->getConnections($petId);
-        return ResponseHelper::success($connections, HttpStatusEnum::OK->value, 'Breeding connections retrieved successfully.');
+        return ResponseHelper::success(\App\Modules\Pet\Payload\Resources\PetResource::collection($connections), HttpStatusEnum::OK->value, 'Breeding connections retrieved successfully.');
+    }
+
+    public function disconnect(Request $request)
+    {
+        $request->validate([
+            'pet_id' => 'required|exists:pets,id',
+            'target_pet_id' => 'required|exists:pets,id',
+        ]);
+
+        $this->breedingService->disconnect($request->input('pet_id'), $request->input('target_pet_id'));
+        return ResponseHelper::success(null, HttpStatusEnum::OK->value, 'Breeding connection removed successfully.');
     }
 }

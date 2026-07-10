@@ -17,19 +17,25 @@ class MessageController extends Controller
     public function store(int $petId, SendMessageRequest $request)
     {
         $message = $this->messageService->sendMessage($petId, $request->validated());
-        return ResponseHelper::success($message, HttpStatusEnum::OK->value);
+        return ResponseHelper::success(new \App\Modules\Message\Payload\Resources\MessageResource($message), HttpStatusEnum::OK->value);
     }
 
     public function index(int $petId, int $otherPetId)
     {
         $messages = $this->messageService->getMessages($petId, $otherPetId);
-        return ResponseHelper::success($messages, HttpStatusEnum::OK->value);
+        return ResponseHelper::success(
+            new \App\Modules\Core\Payload\Resources\PaginatedResource($messages, \App\Modules\Message\Payload\Resources\MessageResource::class),
+            HttpStatusEnum::OK->value
+        );
     }
 
     public function conversations(int $petId)
     {
         $conversations = $this->messageService->getConversations($petId);
-        return ResponseHelper::success($conversations, HttpStatusEnum::OK->value);
+        return ResponseHelper::success(
+            new \App\Modules\Core\Payload\Resources\PaginatedResource($conversations, \App\Modules\Message\Payload\Resources\MessageResource::class),
+            HttpStatusEnum::OK->value
+        );
     }
 
     public function unreadCount(int $petId)

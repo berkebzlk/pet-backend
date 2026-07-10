@@ -211,4 +211,31 @@ class BreedingService extends BaseEloquentService
 
         return Pet::whereIn('id', $connectedPetIds)->get();
     }
+
+    public function disconnect(int $petId, int $targetPetId)
+    {
+        $connection = $this->breedingConnection->where('status', StatusEnum::ACCEPTED->value)
+            ->where(function ($query) use ($petId, $targetPetId) {
+                $query->where(function ($q) use ($petId, $targetPetId) {
+                    $q->where('initiator_pet_id', $petId)
+                      ->where('target_pet_id', $targetPetId);
+                })->orWhere(function ($q) use ($petId, $targetPetId) {
+                    $q->where('initiator_pet_id', $targetPetId)
+                      ->where('target_pet_id', $petId);
+                });
+            })->first();
+
+        if (!$connection) {
+            throw new \Exception("Breeding connection not found", HttpStatusEnum::NOT_FOUND->value);
+        }
+
+        $pet1 = Pet::find($petId);
+        $pet2 = Pet::find($targetPetId);
+        if (($pet1 && $pet1->user_id !== Auth::id()) && ($pet2 && $pet2->user_id !== Auth::id())) {
+            throw new \Exception("Forbidden", HttpStatusEnum::FORBIDDEN->value);
+        }
+
+        $connection->delete();
+        return null;
+    }
 }
