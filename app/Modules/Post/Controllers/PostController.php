@@ -109,7 +109,21 @@ class PostController extends Controller
 
     public function show($id)
     {
-        $post = $this->postService->show($id);
+        $viewingPetId = request()->query('pet_id');
+        
+        $query = \App\Modules\Post\Models\Post::where('id', $id);
+        if ($viewingPetId) {
+            $query->withExists([
+                'likes as is_liked' => function ($q) use ($viewingPetId) {
+                    $q->where('pet_id', $viewingPetId);
+                },
+                'savedBy as is_saved' => function ($q) use ($viewingPetId) {
+                    $q->where('pet_id', $viewingPetId);
+                }
+            ]);
+        }
+        
+        $post = $query->firstOrFail();
 
         $post->load(['pet', 'likes', 'comments']);
         $post->loadCount(['likes', 'comments']);
