@@ -60,11 +60,75 @@ class PostService extends BaseEloquentService
         });
     }
 
-    public function getFeed(?int $viewingPetId = null)
+    public function getFeed(?int $viewingPetId = null, int $page = 1, int $limit = 10)
     {
-        $query = $this->post->with(['pet', 'veterinaryProfile'])->latest();
-        $this->applyViewingPet($query, $viewingPetId);
-        return $query->get();
+        if (!$viewingPetId) {
+            $query = $this->post->with(['pet', 'veterinaryProfile'])->latest()->offset(($page - 1) * $limit)->limit($limit);
+            $this->applyViewingPet($query, $viewingPetId);
+            return $query->get();
+        }
+
+        // 1. Get connection pet IDs (matches and breeding connections)
+        $matchedIds = DB::table('matches')
+            ->where(function($q) use ($viewingPetId) {
+                $q->where('initiator_pet_id', $viewingPetId)
+                  ->orWhere('target_pet_id', $viewingPetId);
+            })
+            ->where('status', 5) // StatusEnum::ACCEPTED
+            ->get()
+            ->map(fn($row) => $row->initiator_pet_id == $viewingPetId ? $row->target_pet_id : $row->initiator_pet_id)
+            ->toArray();
+
+        $breedingIds = DB::table('breeding_connections')
+            ->where(function($q) use ($viewingPetId) {
+                $q->where('initiator_pet_id', $viewingPetId)
+                  ->orWhere('target_pet_id', $viewingPetId);
+            })
+            ->where('status', 'accepted')
+            ->get()
+            ->map(fn($row) => $row->initiator_pet_id == $viewingPetId ? $row->target_pet_id : $row->initiator_pet_id)
+            ->toArray();
+
+        $connectedPetIds = array_values(array_unique(array_merge($matchedIds, $breedingIds)));
+
+        // 2. Determine target limits and offsets (70% connections, 30% strangers)
+        $connLimit = (int)ceil($limit * 0.7);
+        $strangerLimit = $limit - $connLimit;
+        
+        $connOffset = ($page - 1) * $connLimit;
+        $strangerOffset = ($page - 1) * ($limit - $connLimit);
+
+        // 3. Fetch connection posts
+        $connPosts = collect();
+        if (!empty($connectedPetIds)) {
+            $connQuery = $this->post->whereIn('pet_id', $connectedPetIds)
+                ->with(['pet', 'veterinaryProfile'])
+                ->latest();
+            $this->applyViewingPet($connQuery, $viewingPetId);
+            $connPosts = $connQuery->offset($connOffset)->limit($connLimit)->get();
+        }
+
+        // 4. Backfill logic (if connections have fewer posts, fetch more from strangers)
+        $connCount = $connPosts->count();
+        if ($connCount < $connLimit) {
+            $strangerLimit += ($connLimit - $connCount);
+        }
+
+        // 5. Fetch stranger posts
+        $strangerQuery = $this->post->where(function($q) use ($viewingPetId, $connectedPetIds) {
+            $q->whereNull('pet_id') // Veterinary/clinic posts
+              ->orWhere(function($sub) use ($viewingPetId, $connectedPetIds) {
+                  $sub->whereNotIn('pet_id', array_merge($connectedPetIds, [$viewingPetId]));
+              });
+        })
+        ->with(['pet', 'veterinaryProfile'])
+        ->latest();
+
+        $this->applyViewingPet($strangerQuery, $viewingPetId);
+        $strangerPosts = $strangerQuery->offset($strangerOffset)->limit($strangerLimit)->get();
+
+        // 6. Combine and sort chronologically
+        return $connPosts->concat($strangerPosts)->sortByDesc('created_at')->values();
     }
 
     public function getPetPosts(int $petId, ?int $viewingPetId = null)

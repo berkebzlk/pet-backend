@@ -50,9 +50,61 @@ class PostController extends Controller
     public function index()
     {
         $viewingPetId = request()->query('pet_id');
-        $posts = $this->postService->getFeed($viewingPetId);
+        $page = (int)request()->query('page', 1);
+        $limit = (int)request()->query('limit', 10);
+
+        $posts = $this->postService->getFeed($viewingPetId, $page, $limit);
+        $posts = new \Illuminate\Database\Eloquent\Collection($posts);
         $posts->loadCount(['likes', 'comments']);
-        return ResponseHelper::success(PostResource::collection($posts));
+
+        // Calculate total count for pagination meta
+        $total = 0;
+        if ($viewingPetId) {
+            $matchedIds = \Illuminate\Support\Facades\DB::table('matches')
+                ->where(function($q) use ($viewingPetId) {
+                    $q->where('initiator_pet_id', $viewingPetId)
+                      ->orWhere('target_pet_id', $viewingPetId);
+                })
+                ->where('status', 5)
+                ->get()
+                ->map(fn($row) => $row->initiator_pet_id == $viewingPetId ? $row->target_pet_id : $row->initiator_pet_id)
+                ->toArray();
+
+            $breedingIds = \Illuminate\Support\Facades\DB::table('breeding_connections')
+                ->where(function($q) use ($viewingPetId) {
+                    $q->where('initiator_pet_id', $viewingPetId)
+                      ->orWhere('target_pet_id', $viewingPetId);
+                })
+                ->where('status', 'accepted')
+                ->get()
+                ->map(fn($row) => $row->initiator_pet_id == $viewingPetId ? $row->target_pet_id : $row->initiator_pet_id)
+                ->toArray();
+
+            $connectedPetIds = array_values(array_unique(array_merge($matchedIds, $breedingIds)));
+
+            $connTotal = \App\Modules\Post\Models\Post::whereIn('pet_id', $connectedPetIds)->count();
+            
+            $strangerTotal = \App\Modules\Post\Models\Post::where(function($q) use ($viewingPetId, $connectedPetIds) {
+                $q->whereNull('pet_id')
+                  ->orWhere(function($sub) use ($viewingPetId, $connectedPetIds) {
+                      $sub->whereNotIn('pet_id', array_merge($connectedPetIds, [$viewingPetId]));
+                  });
+            })->count();
+
+            $total = $connTotal + $strangerTotal;
+        } else {
+            $total = \App\Modules\Post\Models\Post::count();
+        }
+
+        return ResponseHelper::success([
+            'items' => PostResource::collection($posts),
+            'pagination' => [
+                'current_page' => $page,
+                'last_page' => (int)ceil($total / $limit),
+                'per_page' => $limit,
+                'total' => $total,
+            ]
+        ]);
     }
 
     public function show($id)
